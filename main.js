@@ -32,7 +32,7 @@ define(function (require, exports, module) {
 		    };
 		})();
 
-	require("qr");
+	require("qrcode");
 	require(["eve"], function (eve) {
 		
 		eve.f = function (event) {
