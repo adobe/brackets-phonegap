@@ -1,0 +1,109 @@
+#pgb-btn:link {
+	opacity: .5;
+}
+#pgb-btn:hover {
+	opacity: .75;
+}
+#pgb-btn {
+	height: 20px;
+	width: 20px;
+	margin: 0 8px -5px 0;
+	display: inline-block;
+}
+#pgb-btn.normal {
+	background-image: url("icon.svg");
+	background-position: 0 0;
+}
+#pgb-btn.disabled {
+	background-image: url("icon.svg");
+	background-position: 0 -40px;
+}
+#pgb-btn.error {
+	background-image: url("icon.svg");
+	background-position: 0 -20px;
+}
+#pgb-btn.progress {
+	background-image: url("icon-progress.svg");
+	background-position: 0 0;
+}
+#pgb-panel span.icon {
+	padding: 4px 0 0 20px;
+	margin: 0 2px;
+	background-image: url("icon.svg");
+}
+#pgb-panel span.icon.ios-complete {
+	background-position: -20px 0;
+}
+#pgb-panel span.icon.ios-pending {
+	background-position: -40px 0;
+}
+#pgb-panel span.icon.ios-error {
+	background-position: -60px 0;
+}
+#pgb-panel span.icon.ios-null {
+	background-position: -80px 0;
+}
+#pgb-panel span.icon.android-complete {
+	background-position: -20px -20px;
+}
+#pgb-panel span.icon.android-pending {
+	background-position: -40px -20px;
+}
+#pgb-panel span.icon.android-error {
+	background-position: -60px -20px;
+}
+#pgb-panel span.icon.android-null {
+	background-position: -80px -20px;
+}
+#pgb-panel span.icon.win-complete {
+	background-position: -20px -40px;
+}
+#pgb-panel span.icon.win-pending {
+	background-position: -40px -40px;
+}
+#pgb-panel span.icon.win-error {
+	background-position: -60px -40px;
+}
+#pgb-panel span.icon.win-null {
+	background-position: -80px -40px;
+}
+#pgb-panel span.icon.bb-complete {
+	background-position: -20px -60px;
+}
+#pgb-panel span.icon.bb-pending {
+	background-position: -40px -60px;
+}
+#pgb-panel span.icon.bb-error {
+	background-position: -60px -60px;
+}
+#pgb-panel span.icon.bb-null {
+	background-position: -80px -60px;
+}
+#pgb-panel span.icon.hp-complete {
+	background-position: -20px -80px;
+}
+#pgb-panel span.icon.hp-pending {
+	background-position: -40px -80px;
+}
+#pgb-panel span.icon.hp-error {
+	background-position: -60px -80px;
+}
+#pgb-panel span.icon.hp-null {
+	background-position: -80px -80px;
+}
+#pgb-panel span.icon.symbian-complete {
+	background-position: -20px -100px;
+}
+#pgb-panel span.icon.symbian-pending {
+	background-position: -40px -100px;
+}
+#pgb-panel span.icon.symbian-error {
+	background-position: -60px -100px;
+}
+#pgb-panel span.icon.symbian-null {
+	background-position: -80px -100px;
+}
+#pgb-panel td {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
