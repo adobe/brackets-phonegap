@@ -154,14 +154,14 @@ define(function (require, exports, module) {
 			var html = '<div class="table-container"><table class="condensed-table">';
 			for (var i = 0; i < json.apps.length; i++) {
 				var app = json.apps[i];
-				html += format('<tr><td><img src="https://build.phonegap.com{icon.link}" height="20" alt="icon" style="margin: -5px"></td><td><a href="https://build.phonegap.com/apps/{id}" target="_blank">{title}</a></td><td class="pgb-desc">{description}</td><td>\
+				html += format('<tr><td><img src="https://build.phonegap.com{icon.link}" height="20" alt="icon" style="margin: -5px"></td><td><a href="https://build.phonegap.com/apps/{id}" target="_blank">{title}</a></td><td>\
 				<span data-download="{download.ios}" id="pgb-app-ios-{id}" class="icon ios-{status.ios}"></span>\
 				<span data-download="{download.android}" id="pgb-app-android-{id}" class="icon android-{status.android}"></span>\
 				<span data-download="{download.winphone}" id="pgb-app-winphone-{id}" class="icon win-{status.winphone}"></span>\
 				<span data-download="{download.blackberry}" id="pgb-app-blackberry-{id}" class="icon bb-{status.blackberry}"></span>\
 				<span data-download="{download.webos}" id="pgb-app-webos-{id}" class="icon hp-{status.webos}"></span>\
 				<span data-download="{download.symbian}" id="pgb-app-symbian-{id}" class="icon symbian-{status.symbian}"></span>\
-				</td></tr>\n', app);
+				</td><td class="pgb-desc">{description}</td></tr>\n', app);
 			}
 			html += "</table></div>";
 			$tableContainer.html(html);
@@ -178,18 +178,40 @@ define(function (require, exports, module) {
 				qr.addData("https://build.phonegap.com" + data + "?qr_key=" + token);
 				qr.make();
 				qr = qr.createSVGPath(4);
-				var $qrcode = $(format('<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="{size}" height="{size}"><path d="{d}"/></svg>', qr));
-				$qrcode.css({margin: "10 " + (560 / 2 - qr.size / 2)});
-		        $("<div class='modal hide' />")
-		            .append($('<div class="modal-header" />')
-				        .append('<a href="#" class="close">&times;</a>')
-			            .append('<h1 class="dialog-title">QR Code</h1>'))
-		            .append($qrcode)
-		            .appendTo(window.document.body)
-		            .modal({
-		                backdrop: "static",
-		                show: true
-		            });
+				var $qrcode = $(format('<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="215" height="240">\
+				<defs>\
+					<filter id="blur" x="-20" y="-20" width="30" height="30">\
+						<feGaussianBlur in="SourceGraphic" stdDeviation="10"/>\
+					</filter>\
+				</defs>\
+			<g transform="translate(20, 20)">\
+				<path id="shadow" filter="url(#blur)" opacity=".75" d="M10,183.257c-8.284,0-15-6.716-15-15v-148c0-8.284,6.716-15,15-15h148c8.284,0,15,6.716,15,15v148c0,8.284-6.716,15-15,15h-40.308l-33.692,24.18l-33.692-24.18H10z"/>\
+				<path fill="#fff" d="M10,173c-8.284,0-15-6.716-15-15v-148c0-8.284,6.716-15,15-15h148c8.284,0,15,6.716,15,15v148c0,8.284-6.716,15-15,15h-40.308l-33.692,46.436l-33.692-46.436H10z"/>\
+			</g>\
+				<path d="{d}" transform="translate(30, 30)"/></svg>', qr));
+				var spanOffset = $(span).offset();
+				$qrcode.css({
+					position: "absolute",
+					zIndex: 2000,
+					top: spanOffset.top - 240,
+					left: spanOffset.left - 94
+				}).appendTo(window.document.body);
+				setTimeout(function () {
+					$(window.document).one("click", function () {
+						$qrcode.remove();
+					});
+				});
+				// $qrcode.css({margin: "10 " + (560 / 2 - qr.size / 2)});
+				// 		        $("<div class='modal hide' />")
+				// 		            .append($('<div class="modal-header" />')
+				//         .append('<a href="#" class="close">&times;</a>')
+				// 			            .append('<h1 class="dialog-title">QR Code</h1>'))
+				// 		            .append($qrcode)
+				// 		            .appendTo(window.document.body)
+				// 		            .modal({
+				// 		                backdrop: "static",
+				// 		                show: true
+				// 		            });
 				
 			}
 		});
