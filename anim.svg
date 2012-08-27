@@ -1,0 +1,65 @@
+<!-- 
+  Copyright (c) 2012 Adobe Systems Incorporated. All rights reserved.
+   
+  Permission is hereby granted, free of charge, to any person obtaining a
+  copy of this software and associated documentation files (the "Software"), 
+  to deal in the Software without restriction, including without limitation 
+  the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+  and/or sell copies of the Software, and to permit persons to whom the 
+  Software is furnished to do so, subject to the following conditions:
+   
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+   
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+  DEALINGS IN THE SOFTWARE.
+-->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="239px" height="60px" viewBox="-188 -7 478 120">
+	<defs>
+	 	<path id="path" d="M-82.5,51c0,0,7,1.5,15,1.5s8-4,16-4s8,4,16,4s8-4,16-4s8,4,16,4s8-4,16-4s8,4,16,4s7.999-4,16-4s8,4,16,4s8-4,16-4s8,4,16,4s8-4,16-4s8,4,16,4s8-4,16-4s8,4,16,4s8-4,16-4s8,3,16,2.5"/>
+		<clipPath id="dot">
+			<rect x="-188" y="20" width="478" height="100"/>
+		</clipPath>
+	</defs>
+ 	<g fill="#fff">
+		<g clip-path="url(#dot)">
+	 		<circle r="8">
+	 			<animateMotion dur="3s" repeatCount="indefinite">
+	 				<mpath xlink:href="#path"/>
+	 			</animateMotion>
+	 		</circle>
+	 		<circle r="7">
+	 			<animateMotion dur="3s" begin=".25s" repeatCount="indefinite">
+	 				<mpath xlink:href="#path"/>
+	 			</animateMotion>
+	 		</circle>
+	 		<circle r="6">
+	 			<animateMotion dur="3s" begin=".5s" repeatCount="indefinite">
+	 				<mpath xlink:href="#path"/>
+	 			</animateMotion>
+	 		</circle>
+	 		<circle r="5">
+	 			<animateMotion dur="3s" begin=".75s" repeatCount="indefinite">
+	 				<mpath xlink:href="#path"/>
+	 			</animateMotion>
+	 		</circle>
+	 		<circle r="4">
+	 			<animateMotion dur="3s" begin="1s" repeatCount="indefinite">
+	 				<mpath xlink:href="#path"/>
+	 			</animateMotion>
+	 		</circle>
+	 		<circle r="3">
+	 			<animateMotion dur="3s" begin="1.25s" repeatCount="indefinite">
+	 				<mpath xlink:href="#path"/>
+	 			</animateMotion>
+	 		</circle>
+		</g>
+		<path id="brackets" d="M-98,1h-60c-11.046,0-20,8.954-20,20v60c0,11.046,8.954,20,20,20h60c11.046,0,20-8.954,20-20V21C-78,9.954-86.954,1-98,1zM-90,71c0,5.523-4.477,10-10,10h-56c-5.523,0-10-4.477-10-10V23c0-5.523,4.477-10,10-10h56c5.523,0,10,4.477,10,10V71zM-125,33h15v26h-15v13h27V21h-27V33zM-158,72h27V59h-14V33h14V21h-27V72z"/>
+		<path id="logo" d="M205.086,79.898l1.925,0.971l7.466-3.861v-5.291l-38.287-19.509l-7.703,3.368v23.6l38.289,18.781l7.701-4.092v-4.092l-9.391-5.771V79.898zM270.229,50.655l7.454-3.85v-5.296l-20.915-10.666V61.27l13.215,6.49l7.7-4.102v-4.092l-9.388-5.784v-4.091L270.229,50.655zM180.043,22.588v21.434l5.459,3.615v6.986l31.051,15.822v7.828l-4.125,2.136l4.94,2.622l37.325-18.303v-42.14l-37.09-18.545L180.043,22.588zM239.483,42.787l8.664-3.984v7.84l-8.664,3.845V42.787zM222.664,51.003l8.67-3.985v7.841l-8.67,3.855V51.003z"/>
+ 	</g>
+</svg>

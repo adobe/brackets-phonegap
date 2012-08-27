@@ -1,3 +1,26 @@
+/*
+ * Copyright (c) 2012 Adobe Systems Incorporated. All rights reserved.
+ *  
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"), 
+ * to deal in the Software without restriction, including without limitation 
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *  
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *  
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+ * DEALINGS IN THE SOFTWARE.
+ * 
+ */
+
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
 /*global define, $, brackets, window */
 
@@ -68,13 +91,15 @@ define(function (require, exports, module) {
 	
 		console.log(path2);
 		var $panel = $('<div id="pgb-panel" class="bottom-panel">\
-		    <div class="toolbar simple-toolbar-layout">\
-		        <div class="title">PhoneGap Build</div>\
-		        <div class="title" id="search-result-summary"></div>\
-		        <a href="#" class="close">&times;</a>\
-		    </div>\
-		    <div class="table-container"></div>\
-		</div>');
+			    <div class="toolbar simple-toolbar-layout">\
+			        <div class="title">PhoneGap Build</div>\
+			        <div class="title" id="search-result-summary"></div>\
+			        <a href="#" class="close">&times;</a>\
+			    </div>\
+			    <div class="table-container"></div>\
+				<div id="pgb-anim">&nbsp;</div>\
+			</div>'),
+			anim = $("#pgb-anim", $panel);
 		$(".content").append($panel);
 		$(".close", $panel).click(eve.f("pgb.panel.close"));
 		var $tableContainer = $(".table-container", $panel),
@@ -96,9 +121,12 @@ define(function (require, exports, module) {
 	        });
 		}
 		eve.on("pgb.status", function () {
-			button[0].className = eve.nt().split(/[\.\/]/)[2];
+			var type = eve.nt().split(/[\.\/]/)[2];
+			button[0].className = type;
+			anim[type == "progress" ? "show" : "hide" ]();
 		});
 		eve.on("pgb.login", function (login, password) {
+			eve("pgb.anim");
 			ajax("token", "login", "post", login, password);
 		});
 		eve.on("pgb.list", function () {
@@ -151,7 +179,7 @@ define(function (require, exports, module) {
 		eve.on("pgb.success.list", function (json) {
 			console.warn(json);
 			// eve("pgb.projectinfo", null, json.apps[0].id);
-			var html = '<div class="table-container"><table class="condensed-table">';
+			var html = '<table class="condensed-table">';
 			for (var i = 0; i < json.apps.length; i++) {
 				var app = json.apps[i];
 				html += format('<tr><td><img src="https://build.phonegap.com{icon.link}" height="20" alt="icon" style="margin: -5px"></td><td><a href="https://build.phonegap.com/apps/{id}" target="_blank">{title}</a></td><td>\
@@ -163,7 +191,7 @@ define(function (require, exports, module) {
 				<span data-download="{download.symbian}" id="pgb-app-symbian-{id}" class="icon symbian-{status.symbian}"></span>\
 				</td><td class="pgb-desc">{description}</td></tr>\n', app);
 			}
-			html += "</table></div>";
+			html += "</table>";
 			$tableContainer.html(html);
 			$tableContainer.click(eve.f("pgb.click.qr"));
 		});

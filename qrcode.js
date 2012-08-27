@@ -465,6 +465,7 @@ var qrcode = function() {
 			} );
 		};
 
+		// Brackets plugins addon: export as SVG Path.
 		_this.createSVGPath = function (cellSize) {
 
 			cellSize = cellSize || 2;
