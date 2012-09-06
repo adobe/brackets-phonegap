@@ -19,7 +19,9 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
   DEALINGS IN THE SOFTWARE.
 -->
-<svg viewBox="0 0 160 192" height="120" width="100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+<svg viewBox="0 0 160 192" height="120" width="100"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 	<defs>
 		<!-- <pattern id="bigwave" patternUnits="userSpaceOnUse" x="0" y="0" width="32" height="32" viewBox="0 0 32 32" >
 			<rect width="32" height="32" fill="#999"/>
@@ -28,13 +30,24 @@
 			</path>
 		</pattern> -->
 
-		<pattern id="wave" patternUnits="userSpaceOnUse" x="0" y="0" width="32" height="32" viewBox="0 0 32 32" >
+		<pattern id="wave" patternUnits="userSpaceOnUse" x="0" y="0" width="32"
+			height="32" viewBox="0 0 32 32" >
 			<rect width="32" height="32" fill="#999"/>
-			<path d="M-2,33.75v-9.125h2C12,24.625,16,16,16,16s4-8.625,16-8.625S48,16,48,16s4,8.625,16,8.625S80,16,80,16s4-8.625,16-8.625s2,0,2,0V33.75" fill="#000">
-				<animateTransform attributeName="transform" attributeType="XML" type="translate" from="0" to="-64" dur="1s" fill="freeze" repeatCount="indefinite"/>
+			<path d="M-2,33.75v-9.125h2C12,24.625,16,16,16,16s4-8.625,16-8.625S
+			48,16,48,16s4,8.625,16,8.625S80,16,80,16s4-8.625,16-8.625s2,0,2,0V
+			33.75" fill="#000">
+				<animateTransform attributeName="transform" attributeType="XML"
+					type="translate" from="0" to="-64" dur="1s" fill="freeze"
+					repeatCount="indefinite"/>
 			</path>
 		</pattern>
-		<path id="logo" d="M10.982,24.057l0.537,0.27L13.6,23.25v-1.476L2.926,16.336l-2.148,0.939v6.58l10.675,5.236L13.6,27.95V26.81l-2.618-1.611V24.057zM29.143,15.904l2.08-1.074v-1.477l-5.833-2.973v8.482l3.685,1.809l2.148-1.142v-1.142l-2.618-1.611v-1.142L29.143,15.904zM4,8.078v5.976l1.522,1.008v1.948l8.657,4.41v2.183l-1.15,0.595l1.377,0.732l10.406-5.103V8.078l-10.34-5.17L4,8.078zM20.571,13.709l2.416-1.111v2.186l-2.416,1.073V13.709zM15.883,16l2.417-1.111v2.187l-2.417,1.074V16z"/>
+		<path id="logo" d="M10.982,24.057l0.537,0.27L13.6,23.25v-1.476L2.926,
+		16.336l-2.148,0.939v6.58l10.675,5.236L13.6,27.95V26.81l-2.618-1.611V
+		24.057zM29.143,15.904l2.08-1.074v-1.477l-5.833-2.973v8.482l3.685,1.809l
+		2.148-1.142v-1.142l-2.618-1.611v-1.142L29.143,15.904zM4,8.078v5.976l
+		1.522,1.008v1.948l8.657,4.41v2.183l-1.15,0.595l1.377,0.732l10.406-5.103V
+		8.078l-10.34-5.17L4,8.078zM20.571,13.709l2.416-1.111v2.186l-2.416,1.073V
+		13.709zM15.883,16l2.417-1.111v2.187l-2.417,1.074V16z"/>
 	</defs>
 	<use xlink:href="#logo" fill="url(#wave)"/>
 </svg>

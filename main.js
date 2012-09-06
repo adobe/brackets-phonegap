@@ -28,8 +28,10 @@ define(function (require, exports, module) {
     "use strict";
 
     var CommandManager = brackets.getModule("command/CommandManager"),
+		ProjectManager = brackets.getModule("project/ProjectManager"),
 		EditorManager  = brackets.getModule("editor/EditorManager"),
         Menus          = brackets.getModule("command/Menus"),
+        FileUtils      = brackets.getModule("file/FileUtils"),
 		eve,
 		format         = (function () {
 		    var tokenRegex = /\{([^\}]+)\}/g,
@@ -56,12 +58,13 @@ define(function (require, exports, module) {
 		})();
 
 	require("qrcode");
-	require(["eve"], function (eve) {
-		
+	require("jszip");
+	require(["eve", "base64"], function (eve, base64) {
+				
 		eve.f = function (event) {
 			var attrs = [].slice.call(arguments, 1);
 			return function () {
-				eve.apply(null, [event, attrs.shift()].concat([].slice.call(arguments, 0)));
+				eve.apply(null, [event, null].concat(attrs).concat([].slice.call(arguments, 0)));
 			};
 		};
 		
@@ -79,6 +82,80 @@ define(function (require, exports, module) {
 			path2 = require.nameToUrl("icon.svg");
 		path2 = path2.substring(0, path2.indexOf("icon.svg["));
 
+
+		// fires "zip" for current project directory
+		// 
+		// eve.on("zip", function () {
+		// 	console.log(this);
+		// });
+		
+		function zipProject() {
+			var rootPath = ProjectManager.getProjectRoot().fullPath,
+				files = [],
+				txt = {txt: 1, html: 1, htm: 1, css: 1, svg: 1, xml: 1, js: 1},
+				count = {
+					c: 0,
+					on: function () {
+						this.c++;
+					},
+					off: function () {
+						this.c--;
+						!this.c && eve("zip", zip);
+					}
+				},
+				zip = new JSZip;
+			function getRelPath(root, path) {
+				root = root.split("/");
+				path = path.split("/");
+				while (path[0] == root[0]) {
+					path.splice(0, 1);
+					root.splice(0, 1);
+				}
+				return new Array(root.length + 1).join("../") + path.join("/");
+			}
+			function readfile(path) {
+				var xhr = new XMLHttpRequest;
+				xhr.onload = function() {
+					eve("file", null, path, xhr.response);
+				}
+				xhr.overrideMimeType("text/plain; charset=x-user-defined");
+				xhr.open("get", getRelPath(FileUtils.getNativeBracketsDirectoryPath(), path), false);
+				xhr.send();
+			}
+			function readdir(path) {
+				count.on();
+				brackets.fs.readdir(path, function (err, filelist) {
+					for (var i = 0; i < filelist.length; i++) {
+						var filename = path + filelist[i];
+		                brackets.fs.stat(filename, function (statErr, statData) {
+		                    if (!statErr) {
+		                        if (statData.isDirectory()) {
+		                            readdir(filename + "/");
+		                        } else if (statData.isFile()) {
+									count.on();
+		                            readfile(filename);
+		                        }
+		                    }
+		                });
+					}
+					count.off();
+				});
+			}
+			eve.on("file", function (path, data) {
+				var ext = path.substring(path.lastIndexOf(".") + 1),
+					isTxt = ext in txt;
+				zip.file(
+					path.substring(rootPath.length),
+					data && (isTxt ? data : base64.encodeBinary(data)),
+					{base64 : !isTxt}
+				);
+				count.off();
+			});
+			readdir(rootPath);
+		}
+
+
+
 		button.attr({
 			title: "testing…",
 			id: "pgb-btn",
@@ -89,7 +166,6 @@ define(function (require, exports, module) {
 		button.insertAfter("#toolbar-go-live");
 		// $("#gold-star").insertBefore(button);
 	
-		console.log(path2);
 		var $panel = $('<div id="pgb-panel" class="bottom-panel">\
 			    <div class="toolbar simple-toolbar-layout">\
 			        <div class="title">PhoneGap Build</div>\
@@ -194,7 +270,7 @@ define(function (require, exports, module) {
 			html += "</table>";
 			$tableContainer.html(html);
 			$tableContainer.click(eve.f("pgb.click.qr"));
-            $(".project-link").click(function(e) {
+            $(".project-link").click(function (e) {
                 eve("pgb.url.open", null, $(e.target).attr("data-url"));
             });
 		});
