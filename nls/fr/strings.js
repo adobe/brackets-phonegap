@@ -25,8 +25,10 @@
 /*global define */
 
 define({
-    "COMMAND_NAME"				: "Fr: PhoneGap Build",
-    "USERNAME_PLACEHOLDER"		: "Fr: Username",
-    "PASSWORD_PLACEHOLDER"		: "Fr: Password",
-    "LOGIN_BUTTON_LABEL"		: "Fr: Login"
+    "COMMAND_NAME"					: "PhoneGap Build",
+    "USERNAME_PLACEHOLDER"			: "Username",
+    "PASSWORD_PLACEHOLDER"			: "Password",
+    "LOGIN_BUTTON_LABEL"			: "Login",
+    "LOGIN_FAILED_DIALOG_TITLE"		: "Login Failed",
+    "LOGIN_FAILED_DIALOG_MESSAGE"	: "Your username or password were not recognized."
 });
