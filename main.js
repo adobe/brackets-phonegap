@@ -24,8 +24,18 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
 /*global define, $, brackets, window */
 
+require.config({
+    paths: {
+        "text" : "lib/text",
+        "i18n" : "lib/i18n"
+    },
+    locale: navigator.language
+});
+
 define(function (require, exports, module) {
     "use strict";
+
+	var Strings = require("strings");
 
     var CommandManager = brackets.getModule("command/CommandManager"),
 		ProjectManager = brackets.getModule("project/ProjectManager"),
@@ -70,7 +80,7 @@ define(function (require, exports, module) {
 		};
 		
 	    var PG_COMMAND_ID = "phonegap.build";   // package-style naming to avoid collisions
-	    CommandManager.register("PhoneGap Build", PG_COMMAND_ID, eve.f("pgb.panel.click"));
+	    CommandManager.register(Strings.COMMAND_NAME, PG_COMMAND_ID, eve.f("pgb.panel.click"));
 
 	    // Then create a menu item bound to the command
 	    // The label of the menu item is the name we gave the command (see above)
@@ -199,7 +209,7 @@ define(function (require, exports, module) {
 	
 		var $panel = $('<div id="pgb-panel" class="bottom-panel">\
 			    <div class="toolbar simple-toolbar-layout">\
-			        <div class="title">PhoneGap Build</div>\
+			        <div class="title">' + Strings.COMMAND_NAME + '</div>\
 			        <div class="title" id="search-result-summary"></div>\
 			        <a href="#" class="close">&times;</a>\
 			    </div>\
@@ -251,9 +261,9 @@ define(function (require, exports, module) {
 		
 		eve.on("pgb.before.login", function () {
 			var $form = $('<form action="#" style="text-align: center">\
-				<input type="email" name="username" placeholder="Username"><br><br>\
-				<input type="password" name="password" placeholder="Password"><br><br>\
-				<input type="submit" class="btn primary" value="Login">\
+				<input type="email" name="username" placeholder="' + Strings.USERNAME_PLACEHOLDER + '"><br><br>\
+				<input type="password" name="password" placeholder="' + Strings.PASSWORD_PLACEHOLDER + '"><br><br>\
+				<input type="submit" class="btn primary" value=" ' + Strings.LOGIN_BUTTON_LABEL + ' ">\
 			</form>');
 			$tableContainer.empty().append($form);
 			var inputs = $("input", $form);
