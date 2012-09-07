@@ -1,4 +1,4 @@
-/*
+	/*
  * Copyright (c) 2012 Adobe Systems Incorporated. All rights reserved.
  *  
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -124,11 +124,24 @@ define(function (require, exports, module) {
 				}
 				return new Array(root.length + 1).join("../") + path.join("/");
 			}
+			function processFile(path, blob) {
+				var dirs = path.split("/"),
+					root = fs.root;
+				for (var i = 0, ii = dirs.length - 1, dir; i < ii; i++) {
+					dir = root.getChildByName(dirs[i]);
+					if (dir) {
+						root = dir;
+					} else {
+						root = root.addDirectory(dirs[i]);
+					}
+				}
+				root.addBlob(dirs[dirs.length - 1], blob);
+				count.off();
+			}
 			function readfile(path) {
 				var xhr = new XMLHttpRequest;
 				xhr.onload = function() {
-					eve("file", null, path, xhr.response);
-					console.log(path, xhr.response);
+					processFile(path, xhr.response);
 				}
 				xhr.responseType = "blob";
 				xhr.open("get", getRelPath(FileUtils.getNativeBracketsDirectoryPath(), path), false);
@@ -156,20 +169,6 @@ define(function (require, exports, module) {
 					count.off();
 				});
 			}
-			eve.on("file", function (path, blob) {
-				var dirs = path.split("/"),
-					root = fs.root;
-				for (var i = 0, ii = dirs.length - 1, dir; i < ii; i++) {
-					dir = root.getChildByName(dirs[i]);
-					if (dir) {
-						root = dir;
-					} else {
-						root = root.addDirectory(dirs[i]);
-					}
-				}
-				root.addBlob(dirs[dirs.length - 1], blob);
-				count.off();
-			});
 			readdir(rootPath);
 		}
 		function updateApp(id) {
