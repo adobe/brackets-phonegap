@@ -41,6 +41,7 @@ define(function (require, exports, module) {
 		ProjectManager = brackets.getModule("project/ProjectManager"),
 		EditorManager  = brackets.getModule("editor/EditorManager"),
         Menus          = brackets.getModule("command/Menus"),
+        Dialogs		   = brackets.getModule("widgets/Dialogs"),
         FileUtils      = brackets.getModule("file/FileUtils"),
 		eve,
 		format         = (function () {
@@ -224,9 +225,10 @@ define(function (require, exports, module) {
 			token;
 		
 		function ajax(url, name, type, username, password) {
+			console.log("ajax", url, name, type, username, password);
 			eve("pgb.status.progress");
 			$.ajax({
-	            url: "https://build.phonegap.com/" + url + (token ? "?auth_token=" + token : ""),
+	            url: "https://build.phonegap.com/" + url + (token ? "?auth_token=" + token : "") + "?" + new Date().getTime(),
 	            type: type || "get",
 	            error: eve.f("pgb.error." + name),
 	            success: eve.f("pgb.success." + name),
@@ -243,6 +245,7 @@ define(function (require, exports, module) {
 			anim[type == "progress" ? "show" : "hide" ]();
 		});
 		eve.on("pgb.login", function (login, password) {
+			console.log("pgb.login");
 			eve("pgb.anim");
 			ajax("token", "login", "post", login, password);
 		});
@@ -282,19 +285,23 @@ define(function (require, exports, module) {
 		});
 		
 		eve.on("pgb.error", function (json) {
+			console.log("pgb.error");
+			Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.LOGIN_FAILED_DIALOG_TITLE, Strings.LOGIN_FAILED_DIALOG_MESSAGE);
 			eve("pgb.status.error");
 		});
 		eve.on("pgb.success", function (json) {
+			console.log("pgb.success");
 			eve("pgb.status.normal");
 		});
 		eve.on("pgb.success.login", function (json) {
+			console.log("pgb.success.login", json);
 			token = json.token;
 			eve("pgb.status.normal");
 			eve("pgb.list");
 		});
 		
 		eve.on("pgb.success.list", function (json) {
-			console.warn(json);
+			console.log("pgb.success.list", json);
 			// eve("pgb.projectinfo", null, json.apps[0].id);
 			var html = '<table class="condensed-table">';
 			for (var i = 0; i < json.apps.length; i++) {
