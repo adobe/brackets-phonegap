@@ -58,8 +58,9 @@ define(function (require, exports, module) {
 		})();
 
 	require("qrcode");
-	require("jszip");
-	require(["eve", "base64"], function (eve, base64) {
+	require(["zip", "zip-fs"]);
+	require(["eve"], function (eve) {
+		zip.workerScriptsPath = "extensions/user/brackets-phonegap/";
 				
 		eve.f = function (event) {
 			var attrs = [].slice.call(arguments, 1);
@@ -89,10 +90,9 @@ define(function (require, exports, module) {
 		// 	console.log(this);
 		// });
 		
-		function zipProject() {
+		function zipProject(f) {
 			var rootPath = ProjectManager.getProjectRoot().fullPath,
 				files = [],
-				txt = {txt: 1, html: 1, htm: 1, css: 1, svg: 1, xml: 1, js: 1},
 				count = {
 					c: 0,
 					on: function () {
@@ -100,10 +100,10 @@ define(function (require, exports, module) {
 					},
 					off: function () {
 						this.c--;
-						!this.c && eve("zip", zip);
+						!this.c && fs.exportBlob(f);
 					}
 				},
-				zip = new JSZip;
+				fs = new zip.fs.FS;
 			function getRelPath(root, path) {
 				root = root.split("/");
 				path = path.split("/");
@@ -117,8 +117,9 @@ define(function (require, exports, module) {
 				var xhr = new XMLHttpRequest;
 				xhr.onload = function() {
 					eve("file", null, path, xhr.response);
+					console.log(path, xhr.response);
 				}
-				xhr.overrideMimeType("text/plain; charset=x-user-defined");
+				xhr.responseType = "blob";
 				xhr.open("get", getRelPath(FileUtils.getNativeBracketsDirectoryPath(), path), false);
 				xhr.send();
 			}
@@ -126,35 +127,65 @@ define(function (require, exports, module) {
 				count.on();
 				brackets.fs.readdir(path, function (err, filelist) {
 					for (var i = 0; i < filelist.length; i++) {
-						var filename = path + filelist[i];
-		                brackets.fs.stat(filename, function (statErr, statData) {
-		                    if (!statErr) {
-		                        if (statData.isDirectory()) {
-		                            readdir(filename + "/");
-		                        } else if (statData.isFile()) {
-									count.on();
-		                            readfile(filename);
-		                        }
-		                    }
-		                });
+						(function (filename) {
+							count.on();
+			                brackets.fs.stat(filename, function (statErr, statData) {
+			                    if (!statErr) {
+			                        if (statData.isDirectory()) {
+			                            readdir(filename + "/");
+			                        } else if (statData.isFile()) {
+										count.on();
+			                            readfile(filename);
+			                        }
+			                    }
+								count.off();
+			                });
+						})(path + filelist[i]);
 					}
 					count.off();
 				});
 			}
-			eve.on("file", function (path, data) {
-				var ext = path.substring(path.lastIndexOf(".") + 1),
-					isTxt = ext in txt;
-				zip.file(
-					path.substring(rootPath.length),
-					data && (isTxt ? data : base64.encodeBinary(data)),
-					{base64 : !isTxt}
-				);
+			eve.on("file", function (path, blob) {
+				var dirs = path.split("/"),
+					root = fs.root;
+				for (var i = 0, ii = dirs.length - 1, dir; i < ii; i++) {
+					dir = root.getChildByName(dirs[i]);
+					if (dir) {
+						root = dir;
+					} else {
+						root = root.addDirectory(dirs[i]);
+					}
+				}
+				root.addBlob(dirs[dirs.length - 1], blob);
 				count.off();
 			});
 			readdir(rootPath);
 		}
-
-
+		function updateApp(id) {
+			zipProject(function (blob) {
+				// console.warn("zip", blob);
+				var xhr = new XMLHttpRequest(),
+					upload = xhr.upload;
+				upload.addEventListener("progress", function (ev) {
+					if (ev.lengthComputable) {
+						var progress = ev.loaded / ev.total,
+							pr20 = Math.round(progress * 20);
+						console.log("[" + new Array(pr20 + 1).join("\u2588") + new Array(20 - pr20 + 1).join("\xb7") + "]");
+					}
+				}, false);
+				upload.addEventListener("load", function (ev) {
+					console.log("done");
+				}, false);
+				upload.addEventListener("error", function (ev) {console.log(ev);}, false);
+				xhr.open(
+					"PUT",
+					"https://build.phonegap.com/api/v1/apps/" + id + "?auth_token=" + token
+		        );
+		        xhr.setRequestHeader("Cache-Control", "no-cache");
+		        xhr.send(blob);
+			});
+		}
+		
 
 		button.attr({
 			title: "testing…",
@@ -265,16 +296,16 @@ define(function (require, exports, module) {
 				<span data-download="{download.blackberry}" id="pgb-app-blackberry-{id}" class="icon bb-{status.blackberry}"></span>\
 				<span data-download="{download.webos}" id="pgb-app-webos-{id}" class="icon hp-{status.webos}"></span>\
 				<span data-download="{download.symbian}" id="pgb-app-symbian-{id}" class="icon symbian-{status.symbian}"></span>\
-				</td><td class="pgb-desc">{description}</td></tr>\n', app);
+				</td><td class="pgb-desc"><a href="#" class="pgb-upload" data-id="{id}">↓</a></td></tr>\n', app);
 			}
 			html += "</table>";
 			$tableContainer.html(html);
-			$tableContainer.click(eve.f("pgb.click.qr"));
+			$tableContainer.click(eve.f("pgb.click"));
             $(".project-link").click(function (e) {
                 eve("pgb.url.open", null, $(e.target).attr("data-url"));
             });
 		});
-		eve.on("pgb.click.qr", function (e) {
+		eve.on("pgb.click", function (e) {
 			var span = e.target;
 			if (!String(span.id).indexOf("pgb-app")) {
 				var data = $(span).attr("data-download");
@@ -320,6 +351,9 @@ define(function (require, exports, module) {
 				// 		                show: true
 				// 		            });
 				
+			}
+			if (span.className == "pgb-upload") {
+				updateApp(span.getAttribute("data-id"));
 			}
 		});
 		eve.on("pgb.success.projectinfo", function (json) {
