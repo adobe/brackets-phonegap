@@ -282,8 +282,8 @@ define(function (require, exports, module) {
 		
 		eve.on("pgb.before.login", function () {
 			var $form = $('<form action="#" style="text-align: center">\
-				<input type="email" name="username" placeholder="' + Strings.USERNAME_PLACEHOLDER + '" value="ccantrel@adobe.com"><br><br>\
-				<input type="password" name="password" placeholder="' + Strings.PASSWORD_PLACEHOLDER + '" value="Allaire1"><br><br>\
+				<input type="email" name="username" placeholder="' + Strings.USERNAME_PLACEHOLDER + '"><br><br>\
+				<input type="password" name="password" placeholder="' + Strings.PASSWORD_PLACEHOLDER + '"><br><br>\
 				<input type="submit" class="btn primary" value=" ' + Strings.LOGIN_BUTTON_LABEL + ' ">\
 			</form>');
 			$tableContainer.empty().append($form);
