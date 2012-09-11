@@ -142,3 +142,18 @@
 	top: 0;
 	left: 0;
 }
+#pgb-link-container {
+	width: 100%;
+	height: 300px;
+	text-align: center;
+	overflow: scroll;
+}
+#pgb-link-container span.project-title {
+	font-weight: bold;
+	display: block;
+}
+
+#pgb-link-dialog-instructions {
+	text-align: left;
+	font-size: 1.1em;
+}
