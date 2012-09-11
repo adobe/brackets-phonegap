@@ -81,11 +81,11 @@ define(function (require, exports, module) {
 		};
 		
 	    var PG_COMMAND_ID = "phonegap.build";   // package-style naming to avoid collisions
-	    CommandManager.register(Strings.COMMAND_NAME, PG_COMMAND_ID, eve.f("pgb.panel.click"));
+	    CommandManager.register(Strings.COMMAND_NAME, PG_COMMAND_ID, eve.f("pgb.button.click"));
 
 	    // Then create a menu item bound to the command
 	    // The label of the menu item is the name we gave the command (see above)
-	    var menu = Menus.getMenu(Menus.AppMenuBar.EDIT_MENU);
+	    var menu = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU);
 	    menu.addMenuItem(Menus.DIVIDER);
 	    menu.addMenuItem(PG_COMMAND_ID);
 	
@@ -172,6 +172,7 @@ define(function (require, exports, module) {
 			readdir(rootPath);
 		}
 		function updateApp(id) {
+			if (!id) id = linkedProjectId;
 			zipProject(function (blob) {
 				// console.warn("zip", blob);
 				var xhr = new XMLHttpRequest(),
@@ -195,7 +196,6 @@ define(function (require, exports, module) {
 		        xhr.send(blob);
 			});
 		}
-		
 
 		button.attr({
 			title: "testing…",
@@ -219,15 +219,20 @@ define(function (require, exports, module) {
 			anim = $("#pgb-anim", $panel);
 		$(".content").append($panel);
 		$(".close", $panel).click(eve.f("pgb.panel.close"));
+
 		var $tableContainer = $(".table-container", $panel),
+			$projectContainer = $("<div>").attr("id", "pgb-link-container"),
 			panelOpened,
-			token;
+			token,
+			linkedProjectId;
 		
 		function ajax(url, name, type, username, password) {
 			console.log("ajax", url, name, type, username, password);
 			eve("pgb.status.progress");
+			var fullUrl = "https://build.phonegap.com/" + url + (token ? "?auth_token=" + token : "") + "?" + new Date().getTime();
+			console.log("ajax", fullUrl);
 			$.ajax({
-	            url: "https://build.phonegap.com/" + url + (token ? "?auth_token=" + token : "") + "?" + new Date().getTime(),
+	            url: fullUrl,
 	            type: type || "get",
 	            error: eve.f("pgb.error." + name),
 	            success: eve.f("pgb.success." + name),
@@ -263,8 +268,8 @@ define(function (require, exports, module) {
 		
 		eve.on("pgb.before.login", function () {
 			var $form = $('<form action="#" style="text-align: center">\
-				<input type="email" name="username" placeholder="' + Strings.USERNAME_PLACEHOLDER + '"><br><br>\
-				<input type="password" name="password" placeholder="' + Strings.PASSWORD_PLACEHOLDER + '"><br><br>\
+				<input type="email" name="username" placeholder="' + Strings.USERNAME_PLACEHOLDER + '" value="ccantrel@adobe.com"><br><br>\
+				<input type="password" name="password" placeholder="' + Strings.PASSWORD_PLACEHOLDER + '" value="Allaire1"><br><br>\
 				<input type="submit" class="btn primary" value=" ' + Strings.LOGIN_BUTTON_LABEL + ' ">\
 			</form>');
 			$tableContainer.empty().append($form);
@@ -295,6 +300,13 @@ define(function (require, exports, module) {
 		eve.on("pgb.success.login", function (json) {
 			console.log("pgb.success.login", json);
 			token = json.token;
+
+			var PGB_LINK_COMMAND_ID = "phonegap.build.link";
+			CommandManager.register("Link with PhontGap Build Project", PGB_LINK_COMMAND_ID, eve.f("pgb.link"));
+			var menu = Menus.getContextMenu("project-context-menu");
+	        menu.addMenuDivider();
+    	    menu.addMenuItem(PGB_LINK_COMMAND_ID);
+
 			eve("pgb.status.normal");
 			eve("pgb.list");
 		});
@@ -312,7 +324,7 @@ define(function (require, exports, module) {
 				<span data-download="{download.blackberry}" id="pgb-app-blackberry-{id}" class="icon bb-{status.blackberry}"></span>\
 				<span data-download="{download.webos}" id="pgb-app-webos-{id}" class="icon hp-{status.webos}"></span>\
 				<span data-download="{download.symbian}" id="pgb-app-symbian-{id}" class="icon symbian-{status.symbian}"></span>\
-				</td><td class="pgb-desc"><a href="#" class="pgb-upload" data-id="{id}">↓</a></td></tr>\n', app);
+				</td><td class="pgb-desc"><a href="#" class="pgb-rebuild" data-id="{id}">Rebuild</a></td></tr>\n', app);
 			}
 			html += "</table>";
 			$tableContainer.html(html);
@@ -320,6 +332,18 @@ define(function (require, exports, module) {
             $(".project-link").click(function (e) {
                 eve("pgb.url.open", null, $(e.target).attr("data-url"));
             });
+
+            var $linkDialogInstructions = $("<p>").attr("id", "pgb-link-dialog-instructions").append(Strings.LINK_DIALOG_INSTRUCTIONS);
+			var linkHtml = '<table class="condensed-table">';
+			for (var i = 0; i < json.apps.length; i++) {
+				var app = json.apps[i];
+				linkHtml += format('<tr><td><input class="pgb-project-radio" type="radio" name="pgb-projects" value="{id}"/></td>\
+									<td><span class="project-title" for="cb-{id}">{title}</span><p>{description}</p></td></tr>\n', app);
+			}
+			linkHtml += "</table></div>";
+			$projectContainer.empty();
+			$projectContainer.append($linkDialogInstructions);
+			$projectContainer.append(linkHtml);
 		});
 		eve.on("pgb.click", function (e) {
 			var span = e.target;
@@ -368,17 +392,45 @@ define(function (require, exports, module) {
 				// 		            });
 				
 			}
-			if (span.className == "pgb-upload") {
-				updateApp(span.getAttribute("data-id"));
+			if (span.className == "pgb-rebuild") {
+				eve("pgb.rebuild", null, span.getAttribute("data-id"));
 			}
 		});
 		eve.on("pgb.success.projectinfo", function (json) {
 			console.warn(2, json);
 		});
+		eve.on("pgb.rebuild", function (id) {
+			console.log("pgb.rebuild", id);
+			ajax("api/v1/apps/" + id, "rebuild", "put");
+		});
+		eve.on("pgb.success.rebuild", function () {
+			// TODO: Some kind of message
+			console.log("pgb.success.rebuild");
+		});
+		eve.on("pgb.failure.rebuild", function () {
+			// TODO: Some kind of message
+			console.log("pgb.failure.rebuild");
+		});
         eve.on("pgb.url.open", function(url) {
-            // TODO: this should be openURLInDefaultBrowser, but it's not in the shell yet.
-            brackets.app.openLiveBrowser(url, false);
-            //brackets.app.openURLInDefaultBrowser(function (err) {}, url);
-        }); 
+            brackets.app.openURLInDefaultBrowser(function (err) {}, url);
+        });
+        eve.on("pgb.radio.click", function(id) {
+        	console.log("pgb.radio.click", id);
+        	if (!linkedProjectId) {
+				var PG_BUILD_COMMAND_ID = "phonegap.build.build";
+				CommandManager.register(Strings.FILE_MENU_ENTRY, PG_BUILD_COMMAND_ID, updateApp);
+				var fileMenu = Menus.getMenu(Menus.AppMenuBar.FILE_MENU);
+				fileMenu.addMenuItem(Menus.DIVIDER);
+				fileMenu.addMenuItem(PG_BUILD_COMMAND_ID);        		
+        	}
+        	linkedProjectId = id;
+        });
+        eve.on("pgb.link", function() {
+        	console.log("pgb.link");
+			Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.LINK_DIALOG_TITLE, $projectContainer);
+            $(".pgb-project-radio").click(function (e) {
+                eve("pgb.radio.click", null, $(e.target).attr("value"));
+            });
+        });
     });
 });
