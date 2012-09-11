@@ -30,5 +30,7 @@ define({
     "PASSWORD_PLACEHOLDER"			: "Password",
     "LOGIN_BUTTON_LABEL"			: "Login",
     "LOGIN_FAILED_DIALOG_TITLE"		: "Login Failed",
-    "LOGIN_FAILED_DIALOG_MESSAGE"	: "Your username or password were not recognized."
+    "LOGIN_FAILED_DIALOG_MESSAGE"	: "Your username or password were not recognized.",
+    "LINK_DIALOG_TITLE"				: "PhoneGap Build Projects",
+    "LINK_DIALOG_INSTRUCTIONS"      : "Select which PhoneGap Build project you would like to link to this directory."
 });
