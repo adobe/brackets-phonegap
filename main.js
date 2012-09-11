@@ -68,6 +68,7 @@ define(function (require, exports, module) {
 		    };
 		})();
 
+	require("widgets/bootstrap-alerts.js");
 	require("qrcode");
 	require(["zip", "zip-fs"]);
 	require(["eve"], function (eve) {
@@ -243,6 +244,19 @@ define(function (require, exports, module) {
 	            crossDomain: true
 	        });
 		}
+
+		// TODO: Complete. Currently just for testing.
+		function showAlert(message) {
+			var $alert = $("<div>").css("display", "none").addClass("alert-message fade in").append( $("<button>").attr({"class":"close", "type":"button", "data-dismiss":"alert"}).html("&times;") );
+			$alert.append($("<h4>").html("This is an alert"));
+			$alert.append($("<a>").addClass("btn").html("OK"));
+			$alert.append( $("<a>").addClass("btn danger").html("Cancel").click(function() {$(".alert-message").alert("close")} ) );
+			console.log($alert);
+			$("#main-toolbar").after($alert);
+			$(".alert-message").alert();
+			$alert.slideDown("slow");
+		}
+
 		eve.on("pgb.status", function () {
 			var type = eve.nt().split(/[\.\/]/)[2];
 			button[0].className = type;
