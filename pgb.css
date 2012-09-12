@@ -157,3 +157,9 @@
 	text-align: left;
 	font-size: 1.1em;
 }
+.alert-message.pgb {
+	text-align: center;
+}
+.alert-message a.pgb {
+	margin: 5px;
+}

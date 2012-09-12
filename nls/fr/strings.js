@@ -32,5 +32,9 @@ define({
     "LOGIN_FAILED_DIALOG_TITLE"		: "Login Failed",
     "LOGIN_FAILED_DIALOG_MESSAGE"	: "Your username or password were not recognized.",
     "LINK_DIALOG_TITLE"				: "PhoneGap Build Projects",
-    "LINK_DIALOG_INSTRUCTIONS"      : "Select which PhoneGap Build project you would like to link to this directory."
+    "LINK_DIALOG_INSTRUCTIONS"      : "Select which PhoneGap Build project you would like to link to this directory.",
+    "LINK_SUCCESSFUL_MESSAGE"		: "Project successfully linked.",
+    "FILE_MENU_ENTRY"				: "Send Files to PhoneGap Build",
+    "UPLOAD_CONFIRMATION_MESSAGE"	: "Are you sure you want to overwrite your files on the server with the files from this directory?",
+    "REBUILDING_SUCCESS_MESSAGE" 	: "Your project is rebuilding. Click on the project name to open the application page in your browser."
 });

@@ -75,6 +75,7 @@ define(function (require, exports, module) {
 		zip.workerScriptsPath = "extensions/user/brackets-phonegap/";
 				
 		eve.f = function (event) {
+			console.log("eve.f", arguments);
 			var attrs = [].slice.call(arguments, 1);
 			return function () {
 				eve.apply(null, [event, null].concat(attrs).concat([].slice.call(arguments, 0)));
@@ -245,18 +246,28 @@ define(function (require, exports, module) {
 	        });
 		}
 
-		// TODO: Complete. Currently just for testing.
-		function showAlert(message) {
-			var $alert = $("<div>").css("display", "none").addClass("alert-message fade in").append( $("<button>").attr({"class":"close", "type":"button", "data-dismiss":"alert"}).html("&times;") );
-			$alert.append($("<h4>").html("This is an alert"));
-			$alert.append($("<a>").addClass("btn").html("OK"));
-			$alert.append( $("<a>").addClass("btn danger").html("Cancel").click(function() {$(".alert-message").alert("close")} ) );
-			console.log($alert);
+		/**
+		 * Displays an alert box between the menu bar and the editor.
+		 *
+		 * @message     The text in the alert box. HTML tags are ok.
+		 * @showButtons Whether or not to show the OK and Cancel buttons. If you don't show them, the alert will
+		 *              automatically close after 3 seconds.
+		 * @name        The name which will be used to invoke your callbacks: pgb.alert.<name>.ok and pgb.alert.<name>.cancel.
+		 */
+		function showAlert(message, showButtons, name) {
+			console.log("showAlert", arguments);
+			var $alert = $("<div>").css("display", "none").addClass("alert-message pgb fade in").append( $("<button>").attr({"class":"close", "type":"button", "data-dismiss":"alert"}).html("&times;") );
+			$alert.append($("<p>").html(message));
+			if (showButtons) {
+				$alert.append($("<a>").addClass("btn pgb").html("OK").click(function(e) {$(".alert-message").alert("close");eve("pgb.alert." + name + ".ok")}));
+				$alert.append( $("<a>").addClass("btn danger pgb").html("Cancel").click(function(e) {$(".alert-message").alert("close");eve("pgb.alert." + name + ".cancel")}));				
+			} else {
+				setTimeout(function() { $(".alert-message").alert("close"); }, 3000);
+			}
 			$("#main-toolbar").after($alert);
 			$(".alert-message").alert();
 			$alert.slideDown("slow");
 		}
-
 		eve.on("pgb.status", function () {
 			var type = eve.nt().split(/[\.\/]/)[2];
 			button[0].className = type;
@@ -420,6 +431,7 @@ define(function (require, exports, module) {
 		eve.on("pgb.success.rebuild", function () {
 			// TODO: Some kind of message
 			console.log("pgb.success.rebuild");
+			showAlert(Strings.REBUILDING_SUCCESS_MESSAGE, false);
 		});
 		eve.on("pgb.failure.rebuild", function () {
 			// TODO: Some kind of message
@@ -428,23 +440,46 @@ define(function (require, exports, module) {
         eve.on("pgb.url.open", function(url) {
             brackets.app.openURLInDefaultBrowser(function (err) {}, url);
         });
-        eve.on("pgb.radio.click", function(id) {
-        	console.log("pgb.radio.click", id);
-        	if (!linkedProjectId) {
-				var PG_BUILD_COMMAND_ID = "phonegap.build.build";
-				CommandManager.register(Strings.FILE_MENU_ENTRY, PG_BUILD_COMMAND_ID, updateApp);
-				var fileMenu = Menus.getMenu(Menus.AppMenuBar.FILE_MENU);
-				fileMenu.addMenuItem(Menus.DIVIDER);
-				fileMenu.addMenuItem(PG_BUILD_COMMAND_ID);        		
-        	}
-        	linkedProjectId = id;
-        });
+        // TODO: Get rid of this.
+    //     eve.on("pgb.radio.click", function(id) {
+    //     	console.log("pgb.radio.click", id);
+    //     	if (!linkedProjectId) {
+				// var PG_BUILD_COMMAND_ID = "phonegap.build.build";
+				// CommandManager.register(Strings.FILE_MENU_ENTRY, PG_BUILD_COMMAND_ID, eve.f("pgb.update.confirm"));
+				// var fileMenu = Menus.getMenu(Menus.AppMenuBar.FILE_MENU);
+				// fileMenu.addMenuItem(Menus.DIVIDER);
+				// fileMenu.addMenuItem(PG_BUILD_COMMAND_ID);
+    //     	}
+    //     	linkedProjectId = id;
+    //     });
         eve.on("pgb.link", function() {
         	console.log("pgb.link");
-			Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.LINK_DIALOG_TITLE, $projectContainer);
-            $(".pgb-project-radio").click(function (e) {
-                eve("pgb.radio.click", null, $(e.target).attr("value"));
-            });
+			Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.LINK_DIALOG_TITLE, $projectContainer).done(eve.f("pgb.close.link"));
+			// TODO: Delete
+            // $(".pgb-project-radio").click(function (e) {
+            //     eve("pgb.radio.click", null, $(e.target).attr("value"));
+            // });
+        });
+        eve.on("pgb.close.link", function(action) {
+        	console.log("pgb.link.close", action);
+			if (action === Dialogs.DIALOG_BTN_CANCEL) {
+				linkedProjectId = null;
+			} else if (action === Dialogs.DIALOG_BTN_OK) {
+				showAlert(Strings.LINK_SUCCESSFUL_MESSAGE);
+				$(input[name=mygroup])
+			}
+        });
+        eve.on("pgb.update.confirm", function() {
+        	console.log("pgb.update.confirm");
+        	showAlert(Strings.UPLOAD_CONFIRMATION_MESSAGE, true, "bundle");
+        });
+        eve.on("pgb.alert.bundle.ok", function() {
+        	console.log("pgb.alert.bundle.ok");
+        	updateApp();
+        });
+        eve.on("pgb.alert.bundle.cancel", function() {
+        	// NO-OP
+        	console.log("pgb.alert.bundle.cancel");
         });
     });
 });
