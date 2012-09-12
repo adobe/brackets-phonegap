@@ -200,7 +200,7 @@ define(function (require, exports, module) {
 		}
 
 		button.attr({
-			title: "testing…",
+			title: Strings.COMMAND_NAME,
 			id: "pgb-btn",
 			href: "#",
 			"class": "disabled"
@@ -252,7 +252,7 @@ define(function (require, exports, module) {
 		 * @message     The text in the alert box. HTML tags are ok.
 		 * @showButtons Whether or not to show the OK and Cancel buttons.
 		 * @name        The name which will be used to invoke your callbacks: pgb.alert.<name>.ok and pgb.alert.<name>.cancel.
-		 * @autoClose   Whether or not to automatically close this alert in 3 seconds.
+		 * @autoClose   Whether or not to automatically close this alert in 4 seconds.
 		 */
 		function showAlert(message, showButtons, name, autoClose) {
 			console.log("showAlert", arguments);
@@ -261,13 +261,15 @@ define(function (require, exports, module) {
 			if (showButtons) {
 				$alert.append($("<a>").addClass("btn pgb").html("OK").click(function(e) {$(".alert-message").alert("close");eve("pgb.alert." + name + ".ok")}));
 				$alert.append( $("<a>").addClass("btn danger pgb").html("Cancel").click(function(e) {$(".alert-message").alert("close");eve("pgb.alert." + name + ".cancel")}));				
+			} else { // Make it closable by clicking anywhere.
+				$alert.click(function(e) {$(".alert-message").alert("close")});
 			}
 			if (autoClose) {
-				setTimeout(function() { $(".alert-message").alert("close"); }, 3000);
+				setTimeout(function() { $(".alert-message").alert("close"); }, 4000);
 			}
 			$("#main-toolbar").after($alert);
 			$(".alert-message").alert();
-			$alert.slideDown("slow");
+			$alert.fadeIn("slow");
 		}
 		eve.on("pgb.status", function () {
 			var type = eve.nt().split(/[\.\/]/)[2];
@@ -337,6 +339,8 @@ define(function (require, exports, module) {
 			var fileMenu = Menus.getMenu(Menus.AppMenuBar.FILE_MENU);
 			fileMenu.addMenuItem(Menus.DIVIDER);
 			fileMenu.addMenuItem(PG_BUILD_COMMAND_ID);
+
+			showAlert(Strings.LOGIN_SUCCESS_MESSAGE + Strings.LINK_PROJECT_MENU_ITEM, false, false);
 
 			eve("pgb.status.normal");
 			eve("pgb.list");
@@ -460,7 +464,7 @@ define(function (require, exports, module) {
 				linkedProjectId = null;
 			} else if (action === Dialogs.DIALOG_BTN_OK) {
 				linkedProjectId = val;
-				showAlert(Strings.LINK_SUCCESSFUL_MESSAGE, false, null, true);
+				showAlert(Strings.LINK_SUCCESSFUL_MESSAGE + Strings.FILE_MENU_ENTRY + ".", false, null, false);
 			}
         });
         eve.on("pgb.update.confirm", function() {
