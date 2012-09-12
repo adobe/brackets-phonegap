@@ -250,18 +250,19 @@ define(function (require, exports, module) {
 		 * Displays an alert box between the menu bar and the editor.
 		 *
 		 * @message     The text in the alert box. HTML tags are ok.
-		 * @showButtons Whether or not to show the OK and Cancel buttons. If you don't show them, the alert will
-		 *              automatically close after 3 seconds.
+		 * @showButtons Whether or not to show the OK and Cancel buttons.
 		 * @name        The name which will be used to invoke your callbacks: pgb.alert.<name>.ok and pgb.alert.<name>.cancel.
+		 * @autoClose   Whether or not to automatically close this alert in 3 seconds.
 		 */
-		function showAlert(message, showButtons, name) {
+		function showAlert(message, showButtons, name, autoClose) {
 			console.log("showAlert", arguments);
 			var $alert = $("<div>").css("display", "none").addClass("alert-message pgb fade in").append( $("<button>").attr({"class":"close", "type":"button", "data-dismiss":"alert"}).html("&times;") );
 			$alert.append($("<p>").html(message));
 			if (showButtons) {
 				$alert.append($("<a>").addClass("btn pgb").html("OK").click(function(e) {$(".alert-message").alert("close");eve("pgb.alert." + name + ".ok")}));
 				$alert.append( $("<a>").addClass("btn danger pgb").html("Cancel").click(function(e) {$(".alert-message").alert("close");eve("pgb.alert." + name + ".cancel")}));				
-			} else {
+			}
+			if (autoClose) {
 				setTimeout(function() { $(".alert-message").alert("close"); }, 3000);
 			}
 			$("#main-toolbar").after($alert);
@@ -293,8 +294,8 @@ define(function (require, exports, module) {
 		
 		eve.on("pgb.before.login", function () {
 			var $form = $('<form action="#" style="text-align: center">\
-				<input type="email" name="username" placeholder="' + Strings.USERNAME_PLACEHOLDER + '"><br><br>\
-				<input type="password" name="password" placeholder="' + Strings.PASSWORD_PLACEHOLDER + '"><br><br>\
+				<input type="email" name="username" placeholder="' + Strings.USERNAME_PLACEHOLDER + '" value="ccantrel@adobe.com"><br><br>\
+				<input type="password" name="password" placeholder="' + Strings.PASSWORD_PLACEHOLDER + '" value="Macro23Media"><br><br>\
 				<input type="submit" class="btn primary" value=" ' + Strings.LOGIN_BUTTON_LABEL + ' ">\
 			</form>');
 			$tableContainer.empty().append($form);
@@ -312,7 +313,6 @@ define(function (require, exports, module) {
 			$panel.hide();
 			EditorManager.resizeEditor();
 		});
-		
 		eve.on("pgb.error", function (json) {
 			console.log("pgb.error");
 			Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.LOGIN_FAILED_DIALOG_TITLE, Strings.LOGIN_FAILED_DIALOG_MESSAGE);
@@ -327,15 +327,20 @@ define(function (require, exports, module) {
 			token = json.token;
 
 			var PGB_LINK_COMMAND_ID = "phonegap.build.link";
-			CommandManager.register("Link with PhontGap Build Project", PGB_LINK_COMMAND_ID, eve.f("pgb.link"));
+			CommandManager.register(Strings.LINK_PROJECT_MENU_ITEM, PGB_LINK_COMMAND_ID, eve.f("pgb.link"));
 			var menu = Menus.getContextMenu("project-context-menu");
 	        menu.addMenuDivider();
     	    menu.addMenuItem(PGB_LINK_COMMAND_ID);
 
+			var PG_BUILD_COMMAND_ID = "phonegap.build.build";
+			CommandManager.register(Strings.FILE_MENU_ENTRY, PG_BUILD_COMMAND_ID, eve.f("pgb.update.confirm"));
+			var fileMenu = Menus.getMenu(Menus.AppMenuBar.FILE_MENU);
+			fileMenu.addMenuItem(Menus.DIVIDER);
+			fileMenu.addMenuItem(PG_BUILD_COMMAND_ID);
+
 			eve("pgb.status.normal");
 			eve("pgb.list");
 		});
-		
 		eve.on("pgb.success.list", function (json) {
 			console.log("pgb.success.list", json);
 			// eve("pgb.projectinfo", null, json.apps[0].id);
@@ -360,6 +365,7 @@ define(function (require, exports, module) {
 
             var $linkDialogInstructions = $("<p>").attr("id", "pgb-link-dialog-instructions").append(Strings.LINK_DIALOG_INSTRUCTIONS);
 			var linkHtml = '<table class="condensed-table">';
+			linkHtml += '<tr><td><input class="pgb-project-radio" type="radio" name="pgb-projects" value="-1" checked/></td><td>' + Strings.UNLINK_OPTION + '</td></tr>';
 			for (var i = 0; i < json.apps.length; i++) {
 				var app = json.apps[i];
 				linkHtml += format('<tr><td><input class="pgb-project-radio" type="radio" name="pgb-projects" value="{id}"/></td>\
@@ -429,9 +435,8 @@ define(function (require, exports, module) {
 			ajax("api/v1/apps/" + id, "rebuild", "put");
 		});
 		eve.on("pgb.success.rebuild", function () {
-			// TODO: Some kind of message
 			console.log("pgb.success.rebuild");
-			showAlert(Strings.REBUILDING_SUCCESS_MESSAGE, false);
+			showAlert(Strings.REBUILDING_SUCCESS_MESSAGE, false, null, true);
 		});
 		eve.on("pgb.failure.rebuild", function () {
 			// TODO: Some kind of message
@@ -440,38 +445,31 @@ define(function (require, exports, module) {
         eve.on("pgb.url.open", function(url) {
             brackets.app.openURLInDefaultBrowser(function (err) {}, url);
         });
-        // TODO: Get rid of this.
-    //     eve.on("pgb.radio.click", function(id) {
-    //     	console.log("pgb.radio.click", id);
-    //     	if (!linkedProjectId) {
-				// var PG_BUILD_COMMAND_ID = "phonegap.build.build";
-				// CommandManager.register(Strings.FILE_MENU_ENTRY, PG_BUILD_COMMAND_ID, eve.f("pgb.update.confirm"));
-				// var fileMenu = Menus.getMenu(Menus.AppMenuBar.FILE_MENU);
-				// fileMenu.addMenuItem(Menus.DIVIDER);
-				// fileMenu.addMenuItem(PG_BUILD_COMMAND_ID);
-    //     	}
-    //     	linkedProjectId = id;
-    //     });
         eve.on("pgb.link", function() {
         	console.log("pgb.link");
 			Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.LINK_DIALOG_TITLE, $projectContainer).done(eve.f("pgb.close.link"));
-			// TODO: Delete
-            // $(".pgb-project-radio").click(function (e) {
-            //     eve("pgb.radio.click", null, $(e.target).attr("value"));
-            // });
         });
         eve.on("pgb.close.link", function(action) {
         	console.log("pgb.link.close", action);
-			if (action === Dialogs.DIALOG_BTN_CANCEL) {
+        	var val = $("input[name=pgb-projects]:checked", $projectContainer).val();
+			console.log("VAL", val);
+        	if (action === Dialogs.DIALOG_BTN_CANCEL) {
+        		// NO-OP. Probably don't have to do anything.
+        	}
+			else if (val == -1) { // Unlinking
 				linkedProjectId = null;
 			} else if (action === Dialogs.DIALOG_BTN_OK) {
-				showAlert(Strings.LINK_SUCCESSFUL_MESSAGE);
-				$(input[name=mygroup])
+				linkedProjectId = val;
+				showAlert(Strings.LINK_SUCCESSFUL_MESSAGE, false, null, true);
 			}
         });
         eve.on("pgb.update.confirm", function() {
         	console.log("pgb.update.confirm");
-        	showAlert(Strings.UPLOAD_CONFIRMATION_MESSAGE, true, "bundle");
+        	if (!linkedProjectId) {
+        		showAlert(Strings.PROJECT_NOT_LINKED_MESSAGE + Strings.LINK_PROJECT_MENU_ITEM, false, null, false);
+        		return;
+        	}
+        	showAlert(Strings.UPLOAD_CONFIRMATION_MESSAGE, true, "bundle", false);
         });
         eve.on("pgb.alert.bundle.ok", function() {
         	console.log("pgb.alert.bundle.ok");
