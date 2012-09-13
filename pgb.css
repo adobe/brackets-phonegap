@@ -57,73 +57,73 @@
 #pgb-panel span.icon.ios-complete {
 	background-position: -20px 0;
 }
-#pgb-panel span.icon.ios-pending {
+#pgb-panel span.icon.ios-null {
 	background-position: -40px 0;
 }
 #pgb-panel span.icon.ios-error {
 	background-position: -60px 0;
 }
-#pgb-panel span.icon.ios-null {
+#pgb-panel span.icon.ios-pending {
 	background-position: -80px 0;
 }
 #pgb-panel span.icon.android-complete {
 	background-position: -20px -20px;
 }
-#pgb-panel span.icon.android-pending {
+#pgb-panel span.icon.android-null {
 	background-position: -40px -20px;
 }
 #pgb-panel span.icon.android-error {
 	background-position: -60px -20px;
 }
-#pgb-panel span.icon.android-null {
+#pgb-panel span.icon.android-pending {
 	background-position: -80px -20px;
 }
-#pgb-panel span.icon.win-complete {
+#pgb-panel span.icon.winphone-complete {
 	background-position: -20px -40px;
 }
-#pgb-panel span.icon.win-pending {
+#pgb-panel span.icon.winphone-null {
 	background-position: -40px -40px;
 }
-#pgb-panel span.icon.win-error {
+#pgb-panel span.icon.winphone-error {
 	background-position: -60px -40px;
 }
-#pgb-panel span.icon.win-null {
+#pgb-panel span.icon.winphone-pending {
 	background-position: -80px -40px;
 }
-#pgb-panel span.icon.bb-complete {
+#pgb-panel span.icon.blackberry-complete {
 	background-position: -20px -60px;
 }
-#pgb-panel span.icon.bb-pending {
+#pgb-panel span.icon.blackberry-null {
 	background-position: -40px -60px;
 }
-#pgb-panel span.icon.bb-error {
+#pgb-panel span.icon.blackberry-error {
 	background-position: -60px -60px;
 }
-#pgb-panel span.icon.bb-null {
+#pgb-panel span.icon.blackberry-pending {
 	background-position: -80px -60px;
 }
-#pgb-panel span.icon.hp-complete {
+#pgb-panel span.icon.webos-complete {
 	background-position: -20px -80px;
 }
-#pgb-panel span.icon.hp-pending {
+#pgb-panel span.icon.webos-null {
 	background-position: -40px -80px;
 }
-#pgb-panel span.icon.hp-error {
+#pgb-panel span.icon.webos-error {
 	background-position: -60px -80px;
 }
-#pgb-panel span.icon.hp-null {
+#pgb-panel span.icon.webos-pending {
 	background-position: -80px -80px;
 }
 #pgb-panel span.icon.symbian-complete {
 	background-position: -20px -100px;
 }
-#pgb-panel span.icon.symbian-pending {
+#pgb-panel span.icon.symbian-null {
 	background-position: -40px -100px;
 }
 #pgb-panel span.icon.symbian-error {
 	background-position: -60px -100px;
 }
-#pgb-panel span.icon.symbian-null {
+#pgb-panel span.icon.symbian-pending {
 	background-position: -80px -100px;
 }
 #pgb-panel td {
@@ -162,4 +162,8 @@
 }
 .alert-message a.pgb {
 	margin: 5px;
+}
+
+.pgb-upload-progress {
+	visibility: hidden;
 }
