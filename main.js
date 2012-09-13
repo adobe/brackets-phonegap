@@ -354,7 +354,14 @@ define(function (require, exports, module) {
 			var html = '<table class="condensed-table">';
 			for (var i = 0; i < json.apps.length; i++) {
 				var app = json.apps[i];
-				html += format('<tr><td><img src="https://build.phonegap.com{icon.link}" height="20" alt="icon" style="margin: -5px"></td><td><a href="#" data-url="https://build.phonegap.com/apps/{id}" class="project-link">{title}</a></td><td>\
+				var projectIcon = "";
+				if (app.icon.filename !== null) {
+					projectIcon = '<img src="https://build.phonegap.com{icon.link}" height="20" alt="icon" style="margin: -5px">';
+				} else {
+					projectIcon = '<span class="icon" style="margin-left: -5px"></span>';
+				}
+
+				html += format('<tr><td>' + projectIcon + '</td><td><a href="#" data-url="https://build.phonegap.com/apps/{id}" class="project-link">{title}</a></td><td>\
 				<span data-download="{download.ios}" id="pgb-app-ios-{id}" class="icon ios-{status.ios}"></span>\
 				<span data-download="{download.android}" id="pgb-app-android-{id}" class="icon android-{status.android}"></span>\
 				<span data-download="{download.winphone}" id="pgb-app-winphone-{id}" class="icon win-{status.winphone}"></span>\
