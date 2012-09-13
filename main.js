@@ -175,21 +175,41 @@ define(function (require, exports, module) {
 		}
 		function updateApp(id) {
 			if (!id) id = linkedProjectId;
+			$("#pgb-progress-" + id).val(0).css("visibility", "visible");
+			//$("#pgb-progress-" + id).css("visibility", "visible");
 			zipProject(function (blob) {
 				// console.warn("zip", blob);
 				var xhr = new XMLHttpRequest(),
 					upload = xhr.upload;
 				upload.addEventListener("progress", function (ev) {
 					if (ev.lengthComputable) {
-						var progress = ev.loaded / ev.total,
-							pr20 = Math.round(progress * 20);
-						console.log("[" + new Array(pr20 + 1).join("\u2588") + new Array(20 - pr20 + 1).join("\xb7") + "]");
+						console.log("progress", ev.loaded);
+						$("#pgb-progress-" + id).val( Math.round((ev.loaded / ev.total) * 100) );
 					}
 				}, false);
-				upload.addEventListener("load", function (ev) {
-					console.log("done");
+				xhr.addEventListener("loadstart", function (ev) {
+					console.log("loadstart", this, ev);
 				}, false);
-				upload.addEventListener("error", function (ev) {console.log(ev);}, false);
+				xhr.addEventListener("loadend", function (ev) {
+					console.log("loadend", this, ev);
+					$("#pgb-progress-" + id).css("visibility", "hidden");
+					eve("pgb.success.status", null, JSON.parse(this.responseText));
+				}, false);
+				xhr.addEventListener("readystatechange", function (ev) {
+					console.log("readystatechange", this, ev);
+				}, false);
+				xhr.addEventListener("abort", function (ev) {
+					console.log("abort", this, ev);
+				}, false);
+				xhr.addEventListener("timeout", function (ev) {
+					console.log("timeout", this, ev);
+				}, false);
+				xhr.addEventListener("load", function (ev) {
+					console.log("load", this, ev);
+				}, false);
+				xhr.addEventListener("error", function (ev) {
+					console.log("error", this, ev);
+				}, false);
 				xhr.open(
 					"PUT",
 					"https://build.phonegap.com/api/v1/apps/" + id + "?auth_token=" + token
@@ -226,12 +246,11 @@ define(function (require, exports, module) {
 			$projectContainer = $("<div>").attr("id", "pgb-link-container"),
 			panelOpened,
 			token,
-			linkedProjectId;
-		
+			linkedProjectId,
+			platforms = ["ios", "android", "winphone", "blackberry", "webos", "symbian"];
+
 		function ajax(url, name, type, username, password) {
-			console.log("ajax", url, name, type, username, password);
-			eve("pgb.status.progress");
-			var fullUrl = "https://build.phonegap.com/" + url + (token ? "?auth_token=" + token : "") + "?" + new Date().getTime();
+			var fullUrl = "https://build.phonegap.com/" + url + (token ? "?auth_token=" + token : "");
 			console.log("ajax", fullUrl);
 			$.ajax({
 	            url: fullUrl,
@@ -256,7 +275,8 @@ define(function (require, exports, module) {
 		 */
 		function showAlert(message, showButtons, name, autoClose) {
 			console.log("showAlert", arguments);
-			var $alert = $("<div>").css("display", "none").addClass("alert-message pgb fade in").append( $("<button>").attr({"class":"close", "type":"button", "data-dismiss":"alert"}).html("&times;") );
+			$(".alert-message").alert("close"); // In case one is already open.
+			var $alert = $("<div>").css({display:"none",position:"absolute",top:0,left:$("#sidebar").css("width"),right:0,"z-index":$("#main-toolbar").css("z-index")+1}).addClass("alert-message pgb fade in").append( $("<button>").attr({"class":"close", "type":"button", "data-dismiss":"alert"}).html("&times;") );
 			$alert.append($("<p>").html(message));
 			if (showButtons) {
 				$alert.append($("<a>").addClass("btn pgb").html("OK").click(function(e) {$(".alert-message").alert("close");eve("pgb.alert." + name + ".ok")}));
@@ -269,8 +289,9 @@ define(function (require, exports, module) {
 			}
 			$("#main-toolbar").after($alert);
 			$(".alert-message").alert();
-			$alert.fadeIn("slow");
+			$alert.fadeIn("fast");
 		}
+
 		eve.on("pgb.status", function () {
 			var type = eve.nt().split(/[\.\/]/)[2];
 			button[0].className = type;
@@ -350,15 +371,15 @@ define(function (require, exports, module) {
 			// eve("pgb.projectinfo", null, json.apps[0].id);
 			var html = '<table class="condensed-table">';
 			for (var i = 0; i < json.apps.length; i++) {
-				var app = json.apps[i];
-				html += format('<tr><td><img src="https://build.phonegap.com{icon.link}" height="20" alt="icon" style="margin: -5px"></td><td><a href="#" data-url="https://build.phonegap.com/apps/{id}" class="project-link">{title}</a></td><td>\
-				<span data-download="{download.ios}" id="pgb-app-ios-{id}" class="icon ios-{status.ios}"></span>\
-				<span data-download="{download.android}" id="pgb-app-android-{id}" class="icon android-{status.android}"></span>\
-				<span data-download="{download.winphone}" id="pgb-app-winphone-{id}" class="icon win-{status.winphone}"></span>\
-				<span data-download="{download.blackberry}" id="pgb-app-blackberry-{id}" class="icon bb-{status.blackberry}"></span>\
-				<span data-download="{download.webos}" id="pgb-app-webos-{id}" class="icon hp-{status.webos}"></span>\
-				<span data-download="{download.symbian}" id="pgb-app-symbian-{id}" class="icon symbian-{status.symbian}"></span>\
-				</td><td class="pgb-desc"><a href="#" class="pgb-rebuild" data-id="{id}">Rebuild</a></td></tr>\n', app);
+				var row = "",
+					app = json.apps[i];
+				row += '<tr><td><img src="https://build.phonegap.com{icon.link}" height="20" alt="icon" style="margin: -5px"></td><td><a href="#" data-url="https://build.phonegap.com/apps/{id}" class="project-link">{title}</a></td><td>';
+				platforms.forEach(function(val, index) {
+					row += '<span data-download="{download.'+val+'}" id="pgb-app-'+val+'-{id}" class="icon '+val+'-{status.'+val+'}"></span>';
+				});
+				row += '</td><td><progress valie="0" max="100" class="pgb-upload-progress" id="pgb-progress-{id}"></td>';
+				row += '<td class="pgb-desc"><a href="#" class="pgb-rebuild" data-id="{id}">Rebuild</a></td></tr>';
+				html += format(row, app);
 			}
 			html += "</table>";
 			$tableContainer.html(html);
@@ -438,8 +459,9 @@ define(function (require, exports, module) {
 			console.log("pgb.rebuild", id);
 			ajax("api/v1/apps/" + id, "rebuild", "put");
 		});
-		eve.on("pgb.success.rebuild", function () {
-			console.log("pgb.success.rebuild");
+		eve.on("pgb.success.rebuild", function (json) {
+			console.log("pgb.success.rebuild", json);
+			eve("pgb.success.status", null, json);
 			showAlert(Strings.REBUILDING_SUCCESS_MESSAGE, false, null, true);
 		});
 		eve.on("pgb.failure.rebuild", function () {
@@ -482,6 +504,21 @@ define(function (require, exports, module) {
         eve.on("pgb.alert.bundle.cancel", function() {
         	// NO-OP
         	console.log("pgb.alert.bundle.cancel");
+        });
+        eve.on("pgb.success.status", function(json) {
+          	console.log("pgb.success.status", json);
+        	var finished = true,
+        		status;
+        	for (var os in json.status) {
+        		status = json.status[os];
+        		if (status == "pending") finished = false;
+        		$("#pgb-app-" + os + "-" + json.id).attr("class", "icon " + os + "-" + status);
+        	}
+        	if (!finished) {
+        		setTimeout(function() {
+        			ajax("api/v1/apps/" + json.id, "status", "get")
+        		}, 5000);
+        	}
         });
     });
 });
