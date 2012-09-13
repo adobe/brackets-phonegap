@@ -58,9 +58,6 @@ define(function (require, exports, module) {
 		                    typeof res == "function" && isFunc && (res = res());
 		                }
 		            });
-		            if (res === null){
-		            	res = "";
-		            }
 		            //res = (res == null || res == obj ? all : res) + "";
 		            return res + "";
 		        };
