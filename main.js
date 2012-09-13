@@ -58,7 +58,7 @@ define(function (require, exports, module) {
 		                    typeof res == "function" && isFunc && (res = res());
 		                }
 		            });
-		            // res = (res == null || res == obj ? all : res) + "";
+		            //res = (res == null || res == obj ? all : res) + "";
 		            return res + "";
 		        };
 		    return function (str, obj) {
@@ -397,6 +397,7 @@ define(function (require, exports, module) {
 									<td><span class="project-title" for="cb-{id}">{title}</span><p>{description}</p></td></tr>\n', app);
 			}
 			linkHtml += "</table></div>";
+			linkHtml = linkHtml.replace(/<p>null<\/p>/g, "<p></p>");
 			$projectContainer.empty();
 			$projectContainer.append($linkDialogInstructions);
 			$projectContainer.append(linkHtml);
