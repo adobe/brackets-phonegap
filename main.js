@@ -399,8 +399,8 @@ define(function (require, exports, module) {
 			linkHtml += '<tr><td><input class="pgb-project-radio" type="radio" name="pgb-projects" value="-1" checked/></td><td>' + Strings.UNLINK_OPTION + '</td></tr>';
 			for (var i = 0; i < json.apps.length; i++) {
 				var app = json.apps[i];
-				linkHtml += format('<tr><td><input class="pgb-project-radio" type="radio" name="pgb-projects" value="{id}"/></td>\
-									<td><span class="project-title" for="cb-{id}">{title}</span><p>{description}</p></td></tr>\n', app);
+				linkHtml += format('<tr><td><input class="pgb-project-radio" type="radio" name="pgb-projects" id="input-{id}" value="{id}"/></td>\
+									<td><label for="input-{id}" class="pgb-project-label"><span class="project-title" for="cb-{id}">{title}</span><p>{description}</p></label></td></tr>\n', app);
 			}
 			linkHtml += "</table></div>";
 			linkHtml = linkHtml.replace(/<p>null<\/p>/g, "<p></p>");

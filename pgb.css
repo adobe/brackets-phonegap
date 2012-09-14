@@ -133,6 +133,7 @@
 #pgb-panel {
 	position: relative;
 }
+
 #pgb-anim {
 	background: rgba(0, 0, 0, .75) url("anim.svg") no-repeat 50% 50%;
 	display: none;
@@ -157,6 +158,13 @@
 	text-align: left;
 	font-size: 1.1em;
 }
+
+.pgb-project-label{
+	width: 100%;
+	text-align: left;
+	padding-top: 0;
+}
+
 .alert-message.pgb {
 	text-align: center;
 }
