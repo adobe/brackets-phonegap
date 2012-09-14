@@ -39,7 +39,7 @@ define({
     "LINK_DIALOG_INSTRUCTIONS"      : "Select which PhoneGap Build project you would like to link to this directory.",
     "LINK_SUCCESSFUL_MESSAGE"		: "Project successfully linked. To push your code to the PhoneGap Build service, choose PhoneGap &rarr; ",
     "PROJECT_NOT_LINKED_MESSAGE"    : "You must first link your folder to an existing PhoneGap Build project. Right-click on your project folder and choose: ",
-    "FILE_MENU_ENTRY"				: "Send Files to PhoneGap Build",
+    "SEND_FILES_MENU_ENTRY"			: "Send Files to PhoneGap Build",
     "UPLOAD_CONFIRMATION_MESSAGE"	: "Are you sure you want to overwrite your files on the server with the files from this directory?",
     "REBUILDING_SUCCESS_MESSAGE" 	: "Your project is rebuilding. Click on the project name to open the application page in your browser."
 });
