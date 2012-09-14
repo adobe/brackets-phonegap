@@ -26,7 +26,7 @@
 
 define({
     "MENU_NAME"                     : "PhoneGap",
-    "COMMAND_NAME"                  : "View PhoneGap Build",
+    "COMMAND_NAME"                  : "Voir PhoneGap Build",
     "USERNAME_PLACEHOLDER"          : "Username",
     "PASSWORD_PLACEHOLDER"          : "Password",
     "LOGIN_BUTTON_LABEL"            : "Login",
