@@ -1,4 +1,4 @@
-	/*
+/*
  * Copyright (c) 2012 Adobe Systems Incorporated. All rights reserved.
  *  
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -70,9 +70,8 @@ define(function (require, exports, module) {
 
 	require("widgets/bootstrap-alerts.js");
 	require("qrcode");
-	require(["zip", "zip-fs"]);
-	require(["eve"], function (eve) {
-		zip.workerScriptsPath = "extensions/user/brackets-phonegap/";
+	require("jszip");
+	require(["eve", "base64"], function (eve, base64) {
 				
 		eve.f = function (event) {
 			console.log("eve.f", arguments);
@@ -85,27 +84,18 @@ define(function (require, exports, module) {
 	    var PG_COMMAND_ID = "phonegap.build";   // package-style naming to avoid collisions
 	    CommandManager.register(Strings.COMMAND_NAME, PG_COMMAND_ID, eve.f("pgb.button.click"));
 
-	    // Then create a menu item bound to the command
-	    // The label of the menu item is the name we gave the command (see above)
 	    var menu = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU);
 	    menu.addMenuItem(Menus.DIVIDER);
 	    menu.addMenuItem(PG_COMMAND_ID);
 	
-	
 		var button = $("<a>"),
 			path2 = require.nameToUrl("icon.svg");
 		path2 = path2.substring(0, path2.indexOf("icon.svg["));
-
-
-		// fires "zip" for current project directory
-		// 
-		// eve.on("zip", function () {
-		// 	console.log(this);
-		// });
 		
-		function zipProject(f) {
+		function zipProject(id) {
 			var rootPath = ProjectManager.getProjectRoot().fullPath,
 				files = [],
+				txt = {txt: 1, html: 1, htm: 1, css: 1, svg: 1, xml: 1, js: 1},
 				count = {
 					c: 0,
 					on: function () {
@@ -113,10 +103,10 @@ define(function (require, exports, module) {
 					},
 					off: function () {
 						this.c--;
-						!this.c && fs.exportBlob(f);
+						!this.c && putZipFile(zip, id);
 					}
 				},
-				fs = new zip.fs.FS;
+				zip = new JSZip;
 			function getRelPath(root, path) {
 				root = root.split("/");
 				path = path.split("/");
@@ -126,18 +116,14 @@ define(function (require, exports, module) {
 				}
 				return new Array(root.length + 1).join("../") + path.join("/");
 			}
-			function processFile(path, blob) {
-				var dirs = path.split("/"),
-					root = fs.root;
-				for (var i = 0, ii = dirs.length - 1, dir; i < ii; i++) {
-					dir = root.getChildByName(dirs[i]);
-					if (dir) {
-						root = dir;
-					} else {
-						root = root.addDirectory(dirs[i]);
-					}
-				}
-				root.addBlob(dirs[dirs.length - 1], blob);
+			function processFile(path, data) {
+				var ext = path.substring(path.lastIndexOf(".") + 1),
+					isTxt = ext in txt;
+					zip.file(
+						path.substring(rootPath.length),
+						data && (isTxt ? data : base64.encodeBinary(data)),
+						{base64 : !isTxt}
+					);
 				count.off();
 			}
 			function readfile(path) {
@@ -145,7 +131,7 @@ define(function (require, exports, module) {
 				xhr.onload = function() {
 					processFile(path, xhr.response);
 				}
-				xhr.responseType = "blob";
+				xhr.overrideMimeType("text/plain; charset=x-user-defined");
 				xhr.open("get", getRelPath(FileUtils.getNativeBracketsDirectoryPath(), path), false);
 				xhr.send();
 			}
@@ -173,48 +159,54 @@ define(function (require, exports, module) {
 			}
 			readdir(rootPath);
 		}
+
 		function updateApp(id) {
 			if (!id) id = linkedProjectId;
 			$("#pgb-progress-" + id).val(0).css("visibility", "visible");
-			zipProject(function (blob) {
-				var xhr = new XMLHttpRequest(),
-					upload = xhr.upload;
-				upload.addEventListener("progress", function (ev) {
-					if (ev.lengthComputable) {
-						console.log("progress", ev.loaded);
-						$("#pgb-progress-" + id).val( Math.round((ev.loaded / ev.total) * 100) );
-					}
-				}, false);
-				xhr.addEventListener("loadstart", function (ev) {
-					console.log("loadstart", this, ev);
-				}, false);
-				xhr.addEventListener("loadend", function (ev) {
-					console.log("loadend", this, ev);
-					$("#pgb-progress-" + id).css("visibility", "hidden");
-					eve("pgb.success.status", null, JSON.parse(this.responseText));
-				}, false);
-				xhr.addEventListener("readystatechange", function (ev) {
-					console.log("readystatechange", this, ev);
-				}, false);
-				xhr.addEventListener("abort", function (ev) {
-					console.log("abort", this, ev);
-				}, false);
-				xhr.addEventListener("timeout", function (ev) {
-					console.log("timeout", this, ev);
-				}, false);
-				xhr.addEventListener("load", function (ev) {
-					console.log("load", this, ev);
-				}, false);
-				xhr.addEventListener("error", function (ev) {
-					console.log("error", this, ev);
-				}, false);
-				xhr.open(
-					"PUT",
-					"https://build.phonegap.com/api/v1/apps/" + id + "?auth_token=" + token
-		        );
-		        xhr.setRequestHeader("Cache-Control", "no-cache");
-		        xhr.send(blob);
-			});
+			zipProject(id);
+		}
+
+		function putZipFile(zip, id) {
+			var xhr = new XMLHttpRequest(),
+				upload = xhr.upload;
+			upload.addEventListener("progress", function (ev) {
+				if (ev.lengthComputable) {
+					console.log("progress", ev.loaded);
+					$("#pgb-progress-" + id).val( Math.round((ev.loaded / ev.total) * 100) );
+				}
+			}, false);
+			xhr.addEventListener("loadstart", function (ev) {
+				console.log("loadstart", this, ev);
+			}, false);
+			xhr.addEventListener("loadend", function (ev) {
+				console.log("loadend", this, ev);
+				$("#pgb-progress-" + id).css("visibility", "hidden");
+				eve("pgb.success.status", null, JSON.parse(this.responseText));
+			}, false);
+			xhr.addEventListener("readystatechange", function (ev) {
+				console.log("readystatechange", this, ev);
+			}, false);
+			xhr.addEventListener("abort", function (ev) {
+				console.log("abort", this, ev);
+			}, false);
+			xhr.addEventListener("timeout", function (ev) {
+				console.log("timeout", this, ev);
+			}, false);
+			xhr.addEventListener("load", function (ev) {
+				console.log("load", this, ev);
+			}, false);
+			xhr.addEventListener("error", function (ev) {
+				console.log("error", this, ev);
+			}, false);
+			xhr.open(
+				"PUT",
+				"https://build.phonegap.com/api/v1/apps/" + id + "?auth_token=" + token
+	        );
+	        xhr.setRequestHeader("Cache-Control", "no-cache");
+	        var zipfile = zip.generate({"base64":false});
+            var bb = new WebKitBlobBuilder(zipfile);
+	        var blob = bb.getBlob("application/zip");
+	        xhr.send(blob);
 		}
 
 		button.attr({
@@ -315,8 +307,8 @@ define(function (require, exports, module) {
 		
 		eve.on("pgb.before.login", function () {
 			var $form = $('<form action="#" style="text-align: center">\
-				<input type="email" name="username" placeholder="' + Strings.USERNAME_PLACEHOLDER + '"><br><br>\
-				<input type="password" name="password" placeholder="' + Strings.PASSWORD_PLACEHOLDER + '"><br><br>\
+				<input type="email" name="username" placeholder="' + Strings.USERNAME_PLACEHOLDER + '" value="ccantrel@adobe.com"><br><br>\
+				<input type="password" name="password" placeholder="' + Strings.PASSWORD_PLACEHOLDER + '" value="Bose29Toes"><br><br>\
 				<input type="submit" class="btn primary" value=" ' + Strings.LOGIN_BUTTON_LABEL + ' ">\
 			</form>');
 			$tableContainer.empty().append($form);
