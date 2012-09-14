@@ -25,6 +25,7 @@
 /*global define */
 
 define({
+    "MENU_NAME"                     : "PhoneGap",
     "COMMAND_NAME"					: "PhoneGap Build",
     "USERNAME_PLACEHOLDER"			: "Username",
     "PASSWORD_PLACEHOLDER"			: "Password",
