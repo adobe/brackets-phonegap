@@ -369,8 +369,16 @@ define(function (require, exports, module) {
 			var html = '<table class="condensed-table">';
 			for (var i = 0; i < json.apps.length; i++) {
 				var row = "",
-					app = json.apps[i];
-				row += '<tr><td><img src="https://build.phonegap.com{icon.link}" height="20" alt="icon" style="margin: -5px"></td><td><a href="#" data-url="https://build.phonegap.com/apps/{id}" class="project-link">{title}</a></td><td>';
+					app = json.apps[i],
+					projectIcon = "";
+
+				if (app.icon.filename !== null) {
+					projectIcon = '<img src="https://build.phonegap.com{icon.link}" height="20" alt="icon" style="margin: -5px">';
+				} else {
+					projectIcon = '<span class="icon" style="margin-left: -5px"></span>';
+				}
+
+				row += '<tr><td>' + projectIcon + '</td><td><a href="#" data-url="https://build.phonegap.com/apps/{id}" class="project-link">{title}</a></td><td>';
 				platforms.forEach(function(val, index) {
 					row += '<span data-download="{download.'+val+'}" id="pgb-app-'+val+'-{id}" class="icon '+val+'-{status.'+val+'}"></span>';
 				});
