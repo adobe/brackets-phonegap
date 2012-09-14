@@ -176,9 +176,7 @@ define(function (require, exports, module) {
 		function updateApp(id) {
 			if (!id) id = linkedProjectId;
 			$("#pgb-progress-" + id).val(0).css("visibility", "visible");
-			//$("#pgb-progress-" + id).css("visibility", "visible");
 			zipProject(function (blob) {
-				// console.warn("zip", blob);
 				var xhr = new XMLHttpRequest(),
 					upload = xhr.upload;
 				upload.addEventListener("progress", function (ev) {
@@ -368,7 +366,6 @@ define(function (require, exports, module) {
 		});
 		eve.on("pgb.success.list", function (json) {
 			console.log("pgb.success.list", json);
-			// eve("pgb.projectinfo", null, json.apps[0].id);
 			var html = '<table class="condensed-table">';
 			for (var i = 0; i < json.apps.length; i++) {
 				var row = "",
@@ -435,19 +432,7 @@ define(function (require, exports, module) {
 					$(window.document).one("click", function () {
 						$qrcode.remove();
 					});
-				});
-				// $qrcode.css({margin: "10 " + (560 / 2 - qr.size / 2)});
-				// 		        $("<div class='modal hide' />")
-				// 		            .append($('<div class="modal-header" />')
-				//         .append('<a href="#" class="close">&times;</a>')
-				// 			            .append('<h1 class="dialog-title">QR Code</h1>'))
-				// 		            .append($qrcode)
-				// 		            .appendTo(window.document.body)
-				// 		            .modal({
-				// 		                backdrop: "static",
-				// 		                show: true
-				// 		            });
-				
+				});				
 			}
 			if (span.className == "pgb-rebuild") {
 				eve("pgb.rebuild", null, span.getAttribute("data-id"));
