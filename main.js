@@ -195,10 +195,7 @@ define(function (require, exports, module) {
 			xhr.addEventListener("error", function (ev) {
 				console.log("error", this, ev);
 			}, false);
-			xhr.open(
-				"PUT",
-				"https://build.phonegap.com/api/v1/apps/" + id + "?auth_token=" + token
-	        );
+			xhr.open("PUT", "https://build.phonegap.com/api/v1/apps/" + id + "?auth_token=" + token);
 	        xhr.setRequestHeader("Cache-Control", "no-cache");
 	        var zipfile = zip.generate({"base64":false});
             var bb = new WebKitBlobBuilder(zipfile);
@@ -304,8 +301,8 @@ define(function (require, exports, module) {
 		
 		eve.on("pgb.before.login", function () {
 			var $form = $('<form action="#" style="text-align: center">\
-				<input type="email" name="username" placeholder="' + Strings.USERNAME_PLACEHOLDER + '" value="ccantrel@adobe.com"><br><br>\
-				<input type="password" name="password" placeholder="' + Strings.PASSWORD_PLACEHOLDER + '" value="Bose29Toes"><br><br>\
+				<input type="email" name="username" placeholder="' + Strings.USERNAME_PLACEHOLDER + '"><br><br>\
+				<input type="password" name="password" placeholder="' + Strings.PASSWORD_PLACEHOLDER + '"><br><br>\
 				<input type="submit" class="btn primary" value=" ' + Strings.LOGIN_BUTTON_LABEL + ' ">\
 			</form>');
 			$tableContainer.empty().append($form);
@@ -343,13 +340,10 @@ define(function (require, exports, module) {
 
 			var PGB_LINK_COMMAND_ID = "phonegap.build.link";
 			CommandManager.register(Strings.LINK_PROJECT_MENU_ITEM, PGB_LINK_COMMAND_ID, eve.f("pgb.link"));
-			var menu = Menus.getContextMenu("project-context-menu");
-	        menu.addMenuDivider();
-    	    menu.addMenuItem(PGB_LINK_COMMAND_ID);
     	    pgMenu.addMenuItem(PGB_LINK_COMMAND_ID);
 
 			var PG_BUILD_COMMAND_ID = "phonegap.build.build";
-			CommandManager.register(Strings.FILE_MENU_ENTRY, PG_BUILD_COMMAND_ID, eve.f("pgb.update.confirm"));
+			CommandManager.register(Strings.SEND_FILES_MENU_ENTRY, PG_BUILD_COMMAND_ID, eve.f("pgb.update.confirm"));
 			
 			pgMenu.addMenuItem(Menus.DIVIDER);
 			pgMenu.addMenuItem(PG_BUILD_COMMAND_ID);
@@ -476,7 +470,7 @@ define(function (require, exports, module) {
 				linkedProjectId = null;
 			} else if (action === Dialogs.DIALOG_BTN_OK) {
 				linkedProjectId = val;
-				showAlert(Strings.LINK_SUCCESSFUL_MESSAGE + Strings.FILE_MENU_ENTRY + ".", false, null, false);
+				showAlert(Strings.LINK_SUCCESSFUL_MESSAGE + Strings.SEND_FILES_MENU_ENTRY + ".", false, null, false);
 			}
         });
         eve.on("pgb.update.confirm", function() {
