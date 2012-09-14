@@ -366,6 +366,7 @@ define(function (require, exports, module) {
 		});
 		eve.on("pgb.success.list", function (json) {
 			console.log("pgb.success.list", json);
+			json.apps.sort(function (a,b) {if (a.title < b.title) return -1; if (a.title > b.title) return 1; return 0; });
 			var html = '<table class="condensed-table">';
 			for (var i = 0; i < json.apps.length; i++) {
 				var row = "",
