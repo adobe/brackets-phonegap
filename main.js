@@ -81,12 +81,9 @@ define(function (require, exports, module) {
 			};
 		};
 		
+		
 	    var PG_COMMAND_ID = "phonegap.build";   // package-style naming to avoid collisions
 	    CommandManager.register(Strings.COMMAND_NAME, PG_COMMAND_ID, eve.f("pgb.button.click"));
-
-	    var menu = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU);
-	    menu.addMenuItem(Menus.DIVIDER);
-	    menu.addMenuItem(PG_COMMAND_ID);
 	
 		var button = $("<a>"),
 			path2 = require.nameToUrl("icon.svg");
@@ -339,17 +336,23 @@ define(function (require, exports, module) {
 			console.log("pgb.success.login", json);
 			token = json.token;
 
+			var PG_MENU_ID = "phonegap.build.menu";
+	      	var pgMenu = Menus.addMenu(Strings.MENU_NAME, PG_MENU_ID);
+
+		    pgMenu.addMenuItem(PG_COMMAND_ID);
+
 			var PGB_LINK_COMMAND_ID = "phonegap.build.link";
 			CommandManager.register(Strings.LINK_PROJECT_MENU_ITEM, PGB_LINK_COMMAND_ID, eve.f("pgb.link"));
 			var menu = Menus.getContextMenu("project-context-menu");
 	        menu.addMenuDivider();
     	    menu.addMenuItem(PGB_LINK_COMMAND_ID);
+    	    pgMenu.addMenuItem(PGB_LINK_COMMAND_ID);
 
 			var PG_BUILD_COMMAND_ID = "phonegap.build.build";
 			CommandManager.register(Strings.FILE_MENU_ENTRY, PG_BUILD_COMMAND_ID, eve.f("pgb.update.confirm"));
-			var fileMenu = Menus.getMenu(Menus.AppMenuBar.FILE_MENU);
-			fileMenu.addMenuItem(Menus.DIVIDER);
-			fileMenu.addMenuItem(PG_BUILD_COMMAND_ID);
+			
+			pgMenu.addMenuItem(Menus.DIVIDER);
+			pgMenu.addMenuItem(PG_BUILD_COMMAND_ID);
 
 			showAlert(Strings.LOGIN_SUCCESS_MESSAGE + Strings.LINK_PROJECT_MENU_ITEM, false, false);
 
