@@ -32,7 +32,7 @@ define({
     "LOGIN_BUTTON_LABEL"			: "Login",
     "LOGIN_FAILED_DIALOG_TITLE"		: "Login Failed",
     "LOGIN_FAILED_DIALOG_MESSAGE"	: "Your username or password were not recognized.",
-    "LOGIN_SUCCESS_MESSAGE"         : "Your existing PhoneGap Build projects are listed below. To associate your code with an existing project, right-click on your project folder and choose: ",
+    "LOGIN_SUCCESS_MESSAGE"         : "Your existing PhoneGap Build projects are listed below. To associate your code with an existing project, open the PhoneGap menu and select: ",
     "LINK_PROJECT_MENU_ITEM"        : "Link with PhoneGap Build Project",
     "UNLINK_OPTION"                 : "None (unlink project)",
     "LINK_DIALOG_TITLE"				: "PhoneGap Build Projects",
