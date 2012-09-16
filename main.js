@@ -136,15 +136,19 @@ define(function (require, exports, module) {
 				count.on();
 				brackets.fs.readdir(path, function (err, filelist) {
 					for (var i = 0; i < filelist.length; i++) {
-						(function (filename) {
+						(function (fullFilename) {
+							var filename = fullFilename.substring(fullFilename.lastIndexOf("/") + 1, fullFilename.length);
+							if (filename.charAt(0) == ".") { // Ignore files that start with a dot
+								return;
+							}
 							count.on();
-			                brackets.fs.stat(filename, function (statErr, statData) {
+			                brackets.fs.stat(fullFilename, function (statErr, statData) {
 			                    if (!statErr) {
 			                        if (statData.isDirectory()) {
-			                            readdir(filename + "/");
+			                            readdir(fullFilename + "/");
 			                        } else if (statData.isFile()) {
 										count.on();
-			                            readfile(filename);
+			                            readfile(fullFilename);
 			                        }
 			                    }
 								count.off();
