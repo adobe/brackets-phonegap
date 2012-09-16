@@ -172,6 +172,10 @@
 	margin: 5px;
 }
 
+.alert-message p {
+	font-size: 1.2em;
+}
+
 .pgb-upload-progress {
 	visibility: hidden;
 }
