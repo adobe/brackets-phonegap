@@ -1,4 +1,4 @@
-Adobe Edge Web Fonts Extension
+PhoneGap Extension for Brackets
 ==============================
 
 Readme content coming soon...
