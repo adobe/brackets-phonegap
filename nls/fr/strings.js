@@ -41,5 +41,6 @@ define({
     "PROJECT_NOT_LINKED_MESSAGE"    : "Vous devez d'abord associer votre dossier à un projet PhoneGap Build. Faites un clic droit sur ​​le dossier de votre projet et choisissez: ",
     "SEND_FILES_MENU_ENTRY"         : "Envoyer des fichiers vers PhoneGap Build",
     "UPLOAD_CONFIRMATION_MESSAGE"   : "Êtes-vous certain de vouloir remplacer vos fichiers sur le serveur par les fichiers de ce répertoire?",
-    "REBUILDING_SUCCESS_MESSAGE"    : "Votre projet est en cours de construction. Cliquez sur le nom du projet pour ouvrir la page de l'application dans votre navigateur."
+    "REBUILDING_SUCCESS_MESSAGE"    : "Votre projet est en cours de construction. Cliquez sur le nom du projet pour ouvrir la page de l'application dans votre navigateur.",
+    "PROJECT_LIST_REBUILD_COMMAND"  : "Reconstruire"
 });

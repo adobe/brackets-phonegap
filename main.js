@@ -377,7 +377,7 @@ define(function (require, exports, module) {
 					row += '<span data-download="{download.'+val+'}" id="pgb-app-'+val+'-{id}" class="icon '+val+'-{status.'+val+'}"></span>';
 				});
 				row += '</td><td><progress valie="0" max="100" class="pgb-upload-progress" id="pgb-progress-{id}"></td>';
-				row += '<td class="pgb-desc"><a href="#" class="pgb-rebuild" data-id="{id}">Rebuild</a></td></tr>';
+				row += '<td class="pgb-desc"><a href="#" class="pgb-rebuild" data-id="{id}">' + Strings.PROJECT_LIST_REBUILD_COMMAND + '</a></td></tr>';
 				html += format(row, app);
 			}
 			html += "</table>";
