@@ -79,10 +79,9 @@ define(function (require, exports, module) {
 				eve.apply(null, [event, null].concat(attrs).concat([].slice.call(arguments, 0)));
 			};
 		};
-		
-		
-	    var PG_COMMAND_ID = "phonegap.build";   // package-style naming to avoid collisions
-	    CommandManager.register(Strings.COMMAND_NAME, PG_COMMAND_ID, eve.f("pgb.button.click"));
+
+	    var PGB_COMMAND_ID = "phonegap.build";   // package-style naming to avoid collisions
+	    CommandManager.register(Strings.COMMAND_NAME, PGB_COMMAND_ID, eve.f("pgb.button.click"));
 	
 		var button = $("<a>"),
 			path2 = require.nameToUrl("icon.svg");
@@ -231,7 +230,8 @@ define(function (require, exports, module) {
 			linkedProjectId,
 			platforms = ["ios", "android", "winphone", "blackberry", "webos", "symbian"];
 
-		function ajax(url, name, type, username, password) {
+		function ajax(url, name, type, username, password, showProgress) {
+			if (showProgress) eve("pgb.status.progress");
 			var fullUrl = "https://build.phonegap.com/" + url + (token ? "?auth_token=" + token : "");
 			$.ajax({
 	            url: fullUrl,
@@ -252,7 +252,7 @@ define(function (require, exports, module) {
 		 * @message     The text in the alert box. HTML tags are ok.
 		 * @showButtons Whether or not to show the OK and Cancel buttons.
 		 * @name        The name which will be used to invoke your callbacks: pgb.alert.<name>.ok and pgb.alert.<name>.cancel.
-		 * @autoClose   Whether or not to automatically close this alert in 4 seconds.
+		 * @autoClose   Whether or not to automatically close this alert in 5 seconds.
 		 */
 		function showAlert(message, showButtons, name, autoClose) {
 			$(".alert-message").alert("close"); // In case one is already open.
@@ -265,7 +265,7 @@ define(function (require, exports, module) {
 				$alert.click(function(e) {$(".alert-message").alert("close")});
 			}
 			if (autoClose) {
-				setTimeout(function() { $(".alert-message").alert("close"); }, 4000);
+				setTimeout(function() { $(".alert-message").alert("close"); }, 5000);
 			}
 			$("#main-toolbar").after($alert);
 			$(".alert-message").alert();
@@ -284,13 +284,13 @@ define(function (require, exports, module) {
 		});
 		eve.on("pgb.login", function (login, password) {
 			eve("pgb.anim");
-			ajax("token", "login", "post", login, password);
+			ajax("token", "login", "post", login, password, true);
 		});
 		eve.on("pgb.list", function () {
-			ajax("api/v1/apps", "list");
+			ajax("api/v1/apps", "list", "get", null, null, true);
 		});
 		eve.on("pgb.projectinfo", function (id) {
-			ajax("api/v1/apps/" + id, "projectinfo");
+			ajax("api/v1/apps/" + id, "projectinfo", "get", null, null, true);
 		});
 		eve.on("pgb.button.click", function () {
 			if (!token) {
@@ -327,23 +327,27 @@ define(function (require, exports, module) {
 		eve.on("pgb.success", function (json) {
 			eve("pgb.status.normal");
 		});
+
+		var PGB_MENU_ID = "phonegap.build.menu";
+	    var PGB_OPEN_COMMAND_ID = "phonegap.build.open";
+		var PGB_LINK_COMMAND_ID = "phonegap.build.link";
+		var PGB_BUILD_COMMAND_ID = "phonegap.build.build";
+
 		eve.on("pgb.success.login", function (json) {
 			token = json.token;
 
-			var PG_MENU_ID = "phonegap.build.menu";
-	      	var pgMenu = Menus.addMenu(Strings.MENU_NAME, PG_MENU_ID);
+	      	var pgMenu = Menus.addMenu(Strings.MENU_NAME, PGB_MENU_ID);
 
-		    pgMenu.addMenuItem(PG_COMMAND_ID);
+		    CommandManager.register(Strings.OPEN_PANEL_MENU_ENTRY, PGB_OPEN_COMMAND_ID, eve.f("pgb.button.click"));
+		    pgMenu.addMenuItem(PGB_OPEN_COMMAND_ID);
 
-			var PGB_LINK_COMMAND_ID = "phonegap.build.link";
 			CommandManager.register(Strings.LINK_PROJECT_MENU_ITEM, PGB_LINK_COMMAND_ID, eve.f("pgb.link"));
     	    pgMenu.addMenuItem(PGB_LINK_COMMAND_ID);
 
-			var PG_BUILD_COMMAND_ID = "phonegap.build.build";
-			CommandManager.register(Strings.SEND_FILES_MENU_ENTRY, PG_BUILD_COMMAND_ID, eve.f("pgb.update.confirm"));
+			CommandManager.register(Strings.SEND_FILES_MENU_ENTRY, PGB_BUILD_COMMAND_ID, eve.f("pgb.update.confirm"));
 			
 			pgMenu.addMenuItem(Menus.DIVIDER);
-			pgMenu.addMenuItem(PG_BUILD_COMMAND_ID);
+			pgMenu.addMenuItem(PGB_BUILD_COMMAND_ID);
 
 			showAlert(Strings.LOGIN_SUCCESS_MESSAGE + Strings.LINK_PROJECT_MENU_ITEM, false, false);
 
@@ -381,7 +385,7 @@ define(function (require, exports, module) {
 
             var $linkDialogInstructions = $("<p>").attr("id", "pgb-link-dialog-instructions").append(Strings.LINK_DIALOG_INSTRUCTIONS);
 			var linkHtml = '<table class="condensed-table">';
-			linkHtml += '<tr><td><input class="pgb-project-radio" type="radio" name="pgb-projects" value="-1" checked/></td><td>' + Strings.UNLINK_OPTION + '</td></tr>';
+			linkHtml += '<tr><td><input class="pgb-project-radio" type="radio" name="pgb-projects" value="-1" id="pgb-unlink-radio" checked/></td><td><label for="pgb-unlink-radio" class="pgb-project-label">' + Strings.UNLINK_OPTION + '</label></td></tr>';
 			for (var i = 0; i < json.apps.length; i++) {
 				var app = json.apps[i];
 				linkHtml += format('<tr><td><input class="pgb-project-radio" type="radio" name="pgb-projects" id="input-{id}" value="{id}"/></td>\
@@ -437,7 +441,7 @@ define(function (require, exports, module) {
 		});
 		eve.on("pgb.rebuild", function (id) {
 			toggleRebuildLabels(id);
-			ajax("api/v1/apps/" + id, "rebuild", "put");
+			ajax("api/v1/apps/" + id, "rebuild", "put", null, null, false);
 		});
 		eve.on("pgb.error.rebuild", function (error) {
 			console.log("pgb.error.rebuild", error);
@@ -497,7 +501,7 @@ define(function (require, exports, module) {
 					($rebuildingMsg.length == Strings.REBUILDING_MESSAGE.length + 3) ? Strings.REBUILDING_MESSAGE : $rebuildingMsg + "."
 				);
         		setTimeout(function() {
-        			ajax("api/v1/apps/" + json.id, "status", "get")
+        			ajax("api/v1/apps/" + json.id, "status", "get", null, null, false)
         		}, 3000);
         	}
         });
