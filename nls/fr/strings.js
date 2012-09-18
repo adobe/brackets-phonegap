@@ -43,5 +43,6 @@ define({
     "UPLOAD_CONFIRMATION_MESSAGE"   : "Êtes-vous sûr de vouloir écraser vos fichiers sur le serveur avec les fichiers de ce répertoire?",
     "REBUILD_LINK"                  : "Rebuild",
     "REBUILDING_MESSAGE"            : "Rebuilding",
-    "REBUILDING_SUCCESS_MESSAGE"    : "Votre projet est la reconstruction. Cliquez sur le nom du projet pour ouvrir la page de l'application dans votre navigateur."
+    "REBUILDING_SUCCESS_MESSAGE"    : "Votre projet est la reconstruction. Cliquez sur le nom du projet pour ouvrir la page de l'application dans votre navigateur.",
+    "REBUILT_SUCCESS_MESSAGE"       : "Your project is finished building."
 });
