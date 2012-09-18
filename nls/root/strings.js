@@ -41,5 +41,8 @@ define({
     "PROJECT_NOT_LINKED_MESSAGE"    : "You must first link your folder to an existing PhoneGap Build project. Right-click on your project folder and choose: ",
     "SEND_FILES_MENU_ENTRY"			: "Send Files to PhoneGap Build",
     "UPLOAD_CONFIRMATION_MESSAGE"	: "Are you sure you want to overwrite your files on the server with the files from this directory?",
-    "REBUILDING_SUCCESS_MESSAGE" 	: "Your project is rebuilding. Click on the project name to open the application page in your browser."
+    "REBUILD_LINK"                  : "Rebuild",
+    "REBUILDING_MESSAGE"            : "Rebuilding",
+    "REBUILDING_SUCCESS_MESSAGE" 	: "Your project is rebuilding. Click on the project name to open the application page in your browser.",
+    "REBUILT_SUCCESS_MESSAGE"       : "Your project is finished building."
 });
