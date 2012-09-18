@@ -137,10 +137,11 @@ define(function (require, exports, module) {
 				brackets.fs.readdir(path, function (err, filelist) {
 					for (var i = 0; i < filelist.length; i++) {
 						(function (fullFilename) {
-							// var filename = fullFilename.substring(fullFilename.lastIndexOf("/") + 1, fullFilename.length);
-							// if (filename.charAt(0) == ".") { // Ignore files that start with a dot
-							// 	return;
-							// }
+							// Ignore files that start with a dot.
+							var filename = fullFilename.substring(fullFilename.lastIndexOf("/") + 1, fullFilename.length);
+							if (filename.charAt(0) == ".") {
+								return;
+							}
 							count.on();
 			                brackets.fs.stat(fullFilename, function (statErr, statData) {
 			                    if (!statErr) {
@@ -189,7 +190,7 @@ define(function (require, exports, module) {
 				}
 			}, false);
 			xhr.addEventListener("loadend", function (ev) { // Success or failure
-				console.log("load", this, ev, this.responseText);
+				console.log("load", this, ev);
 				$("#pgb-progress-" + id).css("visibility", "hidden");
 				eve("pgb.success.status", null, JSON.parse(this.responseText));
 			}, false);
@@ -211,7 +212,6 @@ define(function (require, exports, module) {
 		}).html('<link rel="stylesheet" href="' + path2 + 'pgb.css">')
 		.click(eve.f("pgb.button.click"));
 		button.insertAfter("#toolbar-go-live");
-		// $("#gold-star").insertBefore(button);
 	
 		var $panel = $('<div id="pgb-panel" class="bottom-panel">\
 			    <div class="toolbar simple-toolbar-layout">\
