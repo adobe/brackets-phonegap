@@ -33,6 +33,7 @@ define({
     "LOGIN_FAILED_DIALOG_TITLE"     : "Connecter l'échec",
     "LOGIN_FAILED_DIALOG_MESSAGE"   : "Votre nom d'utilisateur ou mot de passe n'ont pas été reconnus.",
     "LOGIN_SUCCESS_MESSAGE"         : "Vos projets de PhoneGap sont répertoriés ci-dessous. Pour associer votre code avec un projet existant, faites un clic droit sur ​​votre projet et choisissez: ",
+    "OPEN_PANEL_MENU_ENTRY"         : "Open PhoneGap Build Panel",    
     "LINK_PROJECT_MENU_ITEM"        : "Associé avec un projet de PhoneGap Build",
     "UNLINK_OPTION"                 : "Aucun (Dissocier projet)",
     "LINK_DIALOG_TITLE"             : "Projets de PhoneGap Build",
