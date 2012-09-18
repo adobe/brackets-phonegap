@@ -74,7 +74,6 @@ define(function (require, exports, module) {
 	require(["eve", "base64"], function (eve, base64) {
 				
 		eve.f = function (event) {
-			console.log("eve.f", arguments);
 			var attrs = [].slice.call(arguments, 1);
 			return function () {
 				eve.apply(null, [event, null].concat(attrs).concat([].slice.call(arguments, 0)));
@@ -181,16 +180,14 @@ define(function (require, exports, module) {
 		function putZipFile(zipFile, id) {
 			var xhr = new XMLHttpRequest();
 			xhr.upload.addEventListener("loadstart", function (ev) {
-				console.log("loadstart", this, ev);
+				// NO-OP
 			}, false);
 			xhr.upload.addEventListener("progress", function (ev) {
-				console.log("progress", this, ev);
 				if (ev.lengthComputable) {
 					$("#pgb-progress-" + id).val( Math.round((ev.loaded / ev.total) * 100) );
 				}
 			}, false);
 			xhr.addEventListener("loadend", function (ev) { // Success or failure
-				console.log("load", this, ev);
 				$("#pgb-progress-" + id).css("visibility", "hidden");
 				toggleRebuildLabels(id);
 				eve("pgb.success.status", null, JSON.parse(this.responseText));
@@ -236,7 +233,6 @@ define(function (require, exports, module) {
 
 		function ajax(url, name, type, username, password) {
 			var fullUrl = "https://build.phonegap.com/" + url + (token ? "?auth_token=" + token : "");
-			console.log("ajax", fullUrl);
 			$.ajax({
 	            url: fullUrl,
 	            type: type || "get",
@@ -259,7 +255,6 @@ define(function (require, exports, module) {
 		 * @autoClose   Whether or not to automatically close this alert in 4 seconds.
 		 */
 		function showAlert(message, showButtons, name, autoClose) {
-			console.log("showAlert", arguments);
 			$(".alert-message").alert("close"); // In case one is already open.
 			var $alert = $("<div>").css({display:"none",position:"absolute",top:0,left:$("#sidebar").css("width"),right:0,"z-index":$("#main-toolbar").css("z-index")+1}).addClass("alert-message pgb fade in").append( $("<button>").attr({"class":"close", "type":"button", "data-dismiss":"alert"}).html("&times;") );
 			$alert.append($("<p>").html(message));
@@ -288,7 +283,6 @@ define(function (require, exports, module) {
 			anim[type == "progress" ? "show" : "hide" ]();
 		});
 		eve.on("pgb.login", function (login, password) {
-			console.log("pgb.login");
 			eve("pgb.anim");
 			ajax("token", "login", "post", login, password);
 		});
@@ -327,16 +321,13 @@ define(function (require, exports, module) {
 			EditorManager.resizeEditor();
 		});
 		eve.on("pgb.error", function (json) {
-			console.log("pgb.error");
 			Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.LOGIN_FAILED_DIALOG_TITLE, Strings.LOGIN_FAILED_DIALOG_MESSAGE);
 			eve("pgb.status.error");
 		});
 		eve.on("pgb.success", function (json) {
-			console.log("pgb.success");
 			eve("pgb.status.normal");
 		});
 		eve.on("pgb.success.login", function (json) {
-			console.log("pgb.success.login", json);
 			token = json.token;
 
 			var PG_MENU_ID = "phonegap.build.menu";
@@ -360,7 +351,6 @@ define(function (require, exports, module) {
 			eve("pgb.list");
 		});
 		eve.on("pgb.success.list", function (json) {
-			console.log("pgb.success.list", json);
 			json.apps.sort(function (a,b) {if (a.title < b.title) return -1; if (a.title > b.title) return 1; return 0; });
 			var html = '<table class="condensed-table">';
 			for (var i = 0; i < json.apps.length; i++) {
@@ -446,7 +436,6 @@ define(function (require, exports, module) {
 			console.warn(2, json);
 		});
 		eve.on("pgb.rebuild", function (id) {
-			console.log("pgb.rebuild", id);
 			toggleRebuildLabels(id);
 			ajax("api/v1/apps/" + id, "rebuild", "put");
 		});
@@ -454,25 +443,20 @@ define(function (require, exports, module) {
 			console.log("pgb.error.rebuild", error);
 		});
 		eve.on("pgb.success.rebuild", function (json) {
-			console.log("pgb.success.rebuild", json);
 			eve("pgb.success.status", null, json);
 			showAlert(Strings.REBUILDING_SUCCESS_MESSAGE, false, null, true);
 		});
 		eve.on("pgb.failure.rebuild", function () {
-			// TODO: Some kind of message
 			console.log("pgb.failure.rebuild");
 		});
         eve.on("pgb.url.open", function(url) {
             brackets.app.openURLInDefaultBrowser(function (err) {}, url);
         });
         eve.on("pgb.link", function() {
-        	console.log("pgb.link");
 			Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.LINK_DIALOG_TITLE, $projectContainer).done(eve.f("pgb.close.link"));
         });
         eve.on("pgb.close.link", function(action) {
-        	console.log("pgb.link.close", action);
         	var val = $("input[name=pgb-projects]:checked", $projectContainer).val();
-			console.log("VAL", val);
         	if (action === Dialogs.DIALOG_BTN_CANCEL) {
         		// NO-OP. Probably don't have to do anything.
         	}
@@ -484,7 +468,6 @@ define(function (require, exports, module) {
 			}
         });
         eve.on("pgb.update.confirm", function() {
-        	console.log("pgb.update.confirm");
         	if (!linkedProjectId) {
         		showAlert(Strings.PROJECT_NOT_LINKED_MESSAGE + Strings.LINK_PROJECT_MENU_ITEM, false, null, false);
         		return;
@@ -492,15 +475,12 @@ define(function (require, exports, module) {
         	showAlert(Strings.UPLOAD_CONFIRMATION_MESSAGE, true, "bundle", false);
         });
         eve.on("pgb.alert.bundle.ok", function() {
-        	console.log("pgb.alert.bundle.ok");
         	updateApp();
         });
         eve.on("pgb.alert.bundle.cancel", function() {
         	// NO-OP
-        	console.log("pgb.alert.bundle.cancel");
         });
         eve.on("pgb.success.status", function(json) {
-          	console.log("pgb.success.status", json);
         	var finished = true,
         		status;
         	for (var os in json.status) {
