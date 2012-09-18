@@ -192,6 +192,7 @@ define(function (require, exports, module) {
 			xhr.addEventListener("loadend", function (ev) { // Success or failure
 				console.log("load", this, ev);
 				$("#pgb-progress-" + id).css("visibility", "hidden");
+				toggleRebuildLabels(id);
 				eve("pgb.success.status", null, JSON.parse(this.responseText));
 			}, false);
 			xhr.upload.addEventListener("error", function (ev) {
@@ -274,6 +275,11 @@ define(function (require, exports, module) {
 			$("#main-toolbar").after($alert);
 			$(".alert-message").alert();
 			$alert.fadeIn("fast");
+		}
+
+		function toggleRebuildLabels(id) {
+			$("#rebuild-link-" + id).toggle();
+			$("#rebuilding-text-" + id).toggle();
 		}
 
 		eve.on("pgb.status", function () {
@@ -441,8 +447,7 @@ define(function (require, exports, module) {
 		});
 		eve.on("pgb.rebuild", function (id) {
 			console.log("pgb.rebuild", id);
-			$("#rebuild-link-" + id).hide();
-			$("#rebuilding-text-" + id).show();
+			toggleRebuildLabels(id);
 			ajax("api/v1/apps/" + id, "rebuild", "put");
 		});
 		eve.on("pgb.error.rebuild", function (error) {
@@ -504,9 +509,7 @@ define(function (require, exports, module) {
         		$("#pgb-app-" + os + "-" + json.id).attr("class", "icon " + os + "-" + status);
         	}
         	if (finished) {
-				$("#rebuild-link-" + json.id).show();
-				$("#rebuilding-text-" + json.id).html(Strings.REBUILDING_MESSAGE);
-				$("#rebuilding-text-" + json.id).hide();
+        		toggleRebuildLabels(json.id);
 				showAlert(Strings.REBUILT_SUCCESS_MESSAGE, false, null, true);
         	} else {
         		var $rebuildingMsg = $("#rebuilding-text-" + json.id).html();
