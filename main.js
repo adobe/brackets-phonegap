@@ -225,6 +225,7 @@ define(function (require, exports, module) {
 
 		var $tableContainer = $(".table-container", $panel),
 			$projectContainer = $("<div>").attr("id", "pgb-link-container"),
+			$newContainer = $("<div>").attr("id", "pgb-new-item-dialog-container"),
 			panelOpened,
 			token,
 			linkedProjectId,
@@ -332,6 +333,7 @@ define(function (require, exports, module) {
 	    var PGB_OPEN_COMMAND_ID = "phonegap.build.open";
 		var PGB_LINK_COMMAND_ID = "phonegap.build.link";
 		var PGB_BUILD_COMMAND_ID = "phonegap.build.build";
+		var PGB_NEW_COMMAND_ID = "phonegap.build.new";
 
 		eve.on("pgb.success.login", function (json) {
 			token = json.token;
@@ -343,6 +345,9 @@ define(function (require, exports, module) {
 
 			CommandManager.register(Strings.LINK_PROJECT_MENU_ITEM, PGB_LINK_COMMAND_ID, eve.f("pgb.link"));
     	    pgMenu.addMenuItem(PGB_LINK_COMMAND_ID);
+
+    	    CommandManager.register(Strings.NEW_PROJECT_OPTION, PGB_NEW_COMMAND_ID, eve.f("pgb.new"));
+    	    pgMenu.addMenuItem(PGB_NEW_COMMAND_ID);
 
 			CommandManager.register(Strings.SEND_FILES_MENU_ENTRY, PGB_BUILD_COMMAND_ID, eve.f("pgb.update.confirm"));
 			
@@ -396,6 +401,13 @@ define(function (require, exports, module) {
 			$projectContainer.empty();
 			$projectContainer.append($linkDialogInstructions);
 			$projectContainer.append(linkHtml);
+
+
+			var newItemHTML = "";
+			newItemHTML += '<label for="pgb-new-app-name">'+ Strings.NEW_DIALOG_APP_NAME +'</label><input id="pgb-new-app-name" type="text">';
+
+			$newContainer.empty();
+			$newContainer.append(newItemHTML);
 		});
 		eve.on("pgb.click", function (e) {
 			var span = e.target;
@@ -459,6 +471,9 @@ define(function (require, exports, module) {
         eve.on("pgb.link", function() {
 			Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.LINK_DIALOG_TITLE, $projectContainer).done(eve.f("pgb.close.link"));
         });
+        eve.on("pgb.new", function() {
+			Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.NEW_DIALOG_TITLE, $newContainer).done(eve.f("pgb.close.new"));
+        });
         eve.on("pgb.close.link", function(action) {
         	var val = $("input[name=pgb-projects]:checked", $projectContainer).val();
         	if (action === Dialogs.DIALOG_BTN_CANCEL) {
@@ -469,6 +484,20 @@ define(function (require, exports, module) {
 			} else if (action === Dialogs.DIALOG_BTN_OK) {
 				linkedProjectId = val;
 				showAlert(Strings.LINK_SUCCESSFUL_MESSAGE + Strings.SEND_FILES_MENU_ENTRY + ".", false, null, false);
+			}
+        });
+         eve.on("pgb.close.new", function(action) {
+        	var val = $("#pgb-new-app-name", $newContainer).val();
+        	if (action === Dialogs.DIALOG_BTN_CANCEL) {
+        		// NO-OP. Probably don't have to do anything.
+        	}
+			else if (action === Dialogs.DIALOG_BTN_OK) {
+				showAlert("Create new project named" + val +  ".", false, null, false);
+				//Create json package for new project
+				//Send json and zip of content to PGB
+					//On Success
+						//Associate this folder and project
+						//reload list of projects
 			}
         });
         eve.on("pgb.update.confirm", function() {
