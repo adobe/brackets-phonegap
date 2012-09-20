@@ -404,7 +404,7 @@ define(function (require, exports, module) {
 
 
 			var newItemHTML = "";
-			newItemHTML += '<label for="pgb-new-app-name">'+ Strings.NEW_DIALOG_APP_NAME +'</label><input id="pgb-new-app-name" type="text">';
+			newItemHTML += '<input placeholder="' + Strings.NEW_DIALOG_APP_NAME + ' id="pgb-new-app-name" type="text">';
 
 			$newContainer.empty();
 			$newContainer.append(newItemHTML);
