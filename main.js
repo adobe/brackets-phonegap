@@ -194,11 +194,24 @@ define(function (require, exports, module) {
 			xhr.upload.addEventListener("error", function (ev) {
 				console.log("Zip file upload error", this, ev);
 			}, false);
-			xhr.open("PUT", "https://build.phonegap.com/api/v1/apps/" + id + "?auth_token=" + token, true);
-	        xhr.setRequestHeader("Cache-Control", "no-cache");
-	        var form = new FormData();
-	        form.append("file", zipFile, "file.zip");
-	        xhr.send(form);
+
+
+			if (typeof(id) === "number") {
+				xhr.open("PUT", "https://build.phonegap.com/api/v1/apps/" + id + "?auth_token=" + token, true);
+		        xhr.setRequestHeader("Cache-Control", "no-cache");
+		        var form = new FormData();
+		        form.append("file", zipFile, "file.zip");
+		        xhr.send(form);
+	    	} else {
+	    		console.log("Creating a new project.");
+	    		var urlToCall = "https://build.phonegap.com/api/v1/apps/?auth_token=" + token;
+	    		xhr.open("POST", urlToCall , true);
+		        xhr.setRequestHeader("Cache-Control", "no-cache");
+		        var form = new FormData();
+		        form.append("file", zipFile, "file.zip");
+		        form.append("data", '{"title":"'+ id +'","create_method":"file"}');
+		        xhr.send(form);
+	    	}	
 		}
 
 		button.attr({
@@ -404,10 +417,14 @@ define(function (require, exports, module) {
 
 
 			var newItemHTML = "";
-			newItemHTML += '<input placeholder="' + Strings.NEW_DIALOG_APP_NAME + ' id="pgb-new-app-name" type="text">';
+			newItemHTML += '<input placeholder="' + Strings.NEW_DIALOG_APP_NAME + '" id="pgb-new-app-name" type="text">';
 
 			$newContainer.empty();
 			$newContainer.append(newItemHTML);
+
+			
+
+			
 		});
 		eve.on("pgb.click", function (e) {
 			var span = e.target;
@@ -493,11 +510,7 @@ define(function (require, exports, module) {
         	}
 			else if (action === Dialogs.DIALOG_BTN_OK) {
 				showAlert("Create new project named" + val +  ".", false, null, false);
-				//Create json package for new project
-				//Send json and zip of content to PGB
-					//On Success
-						//Associate this folder and project
-						//reload list of projects
+				updateApp(val);
 			}
         });
         eve.on("pgb.update.confirm", function() {
@@ -525,10 +538,16 @@ define(function (require, exports, module) {
         		toggleRebuildLabels(json.id);
 				showAlert(Strings.REBUILT_SUCCESS_MESSAGE, false, null, true);
         	} else {
+        		console.log(json);
         		var $rebuildingMsg = $("#rebuilding-text-" + json.id).html();
-				$("#rebuilding-text-" + json.id).html(
-					($rebuildingMsg.length == Strings.REBUILDING_MESSAGE.length + 3) ? Strings.REBUILDING_MESSAGE : $rebuildingMsg + "."
-				);
+				if ($rebuildingMsg) {
+					$("#rebuilding-text-" + json.id).html(
+						($rebuildingMsg.length == Strings.REBUILDING_MESSAGE.length + 3) ? Strings.REBUILDING_MESSAGE : $rebuildingMsg + "."
+					);
+				}
+				else{
+					eve("pgb.list");
+				}
         		setTimeout(function() {
         			ajax("api/v1/apps/" + json.id, "status", "get", null, null, false)
         		}, 3000);
