@@ -45,5 +45,8 @@ define({
     "REBUILD_LINK"                  : "Rebuild",
     "REBUILDING_MESSAGE"            : "Rebuilding",
     "REBUILDING_SUCCESS_MESSAGE" 	: "Your project is rebuilding. Click on the project name to open the application page in your browser.",
-    "REBUILT_SUCCESS_MESSAGE"       : "Your project is finished building."
+    "REBUILT_SUCCESS_MESSAGE"       : "Your project is finished building.",
+    "NEW_PROJECT_OPTION"            : "Create new PhoneGap Build project",
+    "NEW_DIALOG_TITLE"              : "New PhoneGap Build Project",
+    "NEW_DIALOG_APP_NAME"           : "App Name"
 });
