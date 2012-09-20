@@ -31,7 +31,7 @@ define({
 	"PASSWORD_PLACEHOLDER": "Mot de passe",
 	"LOGIN_BUTTON_LABEL": "Ouverture de session",
 	"LOGIN_FAILED_DIALOG_TITLE": "Connecter l’échec",
-	"LOGIN_FAILED_DIALOG_MESSAGE": "Votre nom d’utilisateur ou mot de passe n'ont pas été reconnus.",
+	"LOGIN_FAILED_DIALOG_MESSAGE": "Votre nom d’utilisateur ou mot de passe n’ont pas été reconnus.",
 	"LOGIN_SUCCESS_MESSAGE": "Vos projets de PhoneGap sont répertoriés ci-dessous. Pour associer votre code avec un projet existant, faites un clic droit sur ​​votre projet et choisissez: ",
 	"OPEN_PANEL_MENU_ENTRY": "Ouvrez PhoneGap Build Panneau",
 	"LINK_PROJECT_MENU_ITEM": "Associé avec un projet de PhoneGap Build",
