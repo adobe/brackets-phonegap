@@ -391,7 +391,7 @@ define(function (require, exports, module) {
 					row += '<span data-download="{download.'+val+'}" id="pgb-app-'+val+'-{id}" class="icon '+val+'-{status.'+val+'}"></span>';
 				});
 				row += '</td><td><progress valie="0" max="100" class="pgb-upload-progress" id="pgb-progress-{id}"></td>';
-				row += '<td class="pgb-desc" style="width:200px;"><a href="#" class="pgb-rebuild" data-id="{id}" id="rebuild-link-{id}">' + Strings.REBUILD_LINK + '</a><span style="display:none" id="rebuilding-text-{id}">' + Strings.REBUILDING_MESSAGE + '</span></td></tr>';
+				row += '<td class="pgb-desc" style="width:200px;"><a href="#" class="pgb-rebuild btn btn-mini primary" data-id="{id}" id="rebuild-link-{id}">' + Strings.REBUILD_LINK + '</a><span style="display:none" id="rebuilding-text-{id}">' + Strings.REBUILDING_MESSAGE + '</span></td></tr>';
 				html += format(row, app);
 			}
 			html += "</table>";
