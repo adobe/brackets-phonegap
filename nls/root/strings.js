@@ -48,5 +48,7 @@ define({
     "REBUILT_SUCCESS_MESSAGE"       : "Your project is finished building.",
     "NEW_PROJECT_OPTION"            : "Create new PhoneGap Build project",
     "NEW_DIALOG_TITLE"              : "New PhoneGap Build Project",
-    "NEW_DIALOG_APP_NAME"           : "App Name"
+    "NEW_DIALOG_MESSAGE"            : "Create a new PhoneGap Build project based on the current folder.",
+    "NEW_DIALOG_APP_NAME"           : "App Name",
+    "NEW_ALERT_MESSAGE"             : "Created a new PhoneGap Build project named"
 });
