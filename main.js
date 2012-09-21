@@ -166,6 +166,16 @@ define(function (require, exports, module) {
 			zipProject(id);
 		}
 
+		function deleteApp(id) {
+			var id = pendingDelete;
+			console.log("Delete has been called");
+			var xhr = new XMLHttpRequest();
+			xhr.open("DELETE", "https://build.phonegap.com/api/v1/apps/" + id + "?auth_token=" + token, true);
+		 	xhr.setRequestHeader("Cache-Control", "no-cache");
+		 	xhr.addEventListener("load", function() {eve("pgb.list"); pendingDelete = null;}, false);
+		 	xhr.send();
+		}
+
 		function createZipFile(zip, id) {
 	        var zipfile = zip.generate({"base64":false});
 			var byteArray = new Uint8Array(zipfile.length);
@@ -242,6 +252,7 @@ define(function (require, exports, module) {
 			panelOpened,
 			token,
 			linkedProjectId,
+			pendingDelete,
 			platforms = ["ios", "android", "winphone", "blackberry", "webos", "symbian"];
 
 		function ajax(url, name, type, username, password, showProgress) {
@@ -391,7 +402,8 @@ define(function (require, exports, module) {
 					row += '<span data-download="{download.'+val+'}" id="pgb-app-'+val+'-{id}" class="icon '+val+'-{status.'+val+'}"></span>';
 				});
 				row += '</td><td><progress valie="0" max="100" class="pgb-upload-progress" id="pgb-progress-{id}"></td>';
-				row += '<td class="pgb-desc" style="width:200px;"><a href="#" class="pgb-rebuild btn btn-mini primary" data-id="{id}" id="rebuild-link-{id}">' + Strings.REBUILD_LINK + '</a><span style="display:none" id="rebuilding-text-{id}">' + Strings.REBUILDING_MESSAGE + '</span></td></tr>';
+				row += '<td class="pgb-desc" style="width:75px;"><a href="#" class="pgb-rebuild btn btn-mini primary" data-id="{id}" id="rebuild-link-{id}">' + Strings.REBUILD_LINK + '</a><span style="display:none" id="rebuilding-text-{id}">' + Strings.REBUILDING_MESSAGE + '</span></td>';
+				row += '<td class="pgb-desc" style="width:75px;"><a href="#" class="pgb-delete btn btn-mini danger" data-id="{id}" id="delete-link-{id}">' + Strings.DELETE_LINK + '</a></td></tr>';
 				html += format(row, app);
 			}
 			html += "</table>";
@@ -425,6 +437,7 @@ define(function (require, exports, module) {
 
 		});
 		eve.on("pgb.click", function (e) {
+			console.log("click fired.")
 			var span = e.target;
 			if (!String(span.id).indexOf("pgb-app")) {
 				var data = $(span).attr("data-download");
@@ -459,9 +472,14 @@ define(function (require, exports, module) {
 					});
 				});				
 			}
-			if (span.className == "pgb-rebuild") {
+			console.log(span.className);
+			if (span.className.indexOf("pgb-rebuild") > -1) {
 				eve("pgb.rebuild", null, span.getAttribute("data-id"));
 			}
+
+			if (span.className.indexOf("pgb-delete") > -1) {
+				eve("pgb.delete", null, span.getAttribute("data-id"));
+			} 
 		});
 		eve.on("pgb.success.projectinfo", function (json) {
 			console.warn(2, json);
@@ -469,6 +487,14 @@ define(function (require, exports, module) {
 		eve.on("pgb.rebuild", function (id) {
 			toggleRebuildLabels(id);
 			ajax("api/v1/apps/" + id, "rebuild", "put", null, null, false);
+		});
+		eve.on("pgb.delete", function (id) {
+			console.log("delete fired.");
+			pendingDelete = id;
+			showAlert(Strings.DELETE_CONFIRMATION_MESSAGE, true, "delete", false);
+
+
+
 		});
 		eve.on("pgb.error.rebuild", function (error) {
 			console.log("pgb.error.rebuild", error);
@@ -522,6 +548,12 @@ define(function (require, exports, module) {
         	updateApp();
         });
         eve.on("pgb.alert.bundle.cancel", function() {
+        	// NO-OP
+        });
+         eve.on("pgb.alert.delete.ok", function(id) {
+        	deleteApp(id);
+        });
+        eve.on("pgb.alert.delete.cancel", function() {
         	// NO-OP
         });
         eve.on("pgb.success.status", function(json) {
