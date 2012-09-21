@@ -45,5 +45,12 @@ define({
     "REBUILD_LINK"                  : "Reconstruire",
     "REBUILDING_MESSAGE"            : "Reconstitution",
     "REBUILDING_SUCCESS_MESSAGE"    : "Votre projet est la reconstruction. Cliquez sur le nom du projet pour ouvrir la page de l'application dans votre navigateur.",
-    "REBUILT_SUCCESS_MESSAGE"       : "Votre projet est terminé la reconstruction."
+    "REBUILT_SUCCESS_MESSAGE"       : "Votre projet est terminé la reconstruction.",
+    "NEW_PROJECT_OPTION"            : "Create new PhoneGap Build project",
+    "NEW_DIALOG_TITLE"              : "New PhoneGap Build Project",
+    "NEW_DIALOG_MESSAGE"            : "Create a new PhoneGap Build project based on the current folder.",
+    "NEW_DIALOG_APP_NAME"           : "App Name",
+    "NEW_ALERT_MESSAGE"             : "Created a new PhoneGap Build project named",
+    "DELETE_LINK"                   : "Delete",
+    "DELETE_CONFIRMATION_MESSAGE"   : "Are you sure you want to delete this project?"
 });
