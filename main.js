@@ -422,9 +422,7 @@ define(function (require, exports, module) {
 			$newContainer.empty();
 			$newContainer.append(newItemHTML);
 
-			
 
-			
 		});
 		eve.on("pgb.click", function (e) {
 			var span = e.target;
@@ -538,9 +536,13 @@ define(function (require, exports, module) {
         		toggleRebuildLabels(json.id);
 				showAlert(Strings.REBUILT_SUCCESS_MESSAGE, false, null, true);
         	} else {
-        		console.log(json);
+        		
         		var $rebuildingMsg = $("#rebuilding-text-" + json.id).html();
+
 				if ($rebuildingMsg) {
+					if ($("#rebuilding-text-" + json.id).css("display") == "none"){
+						toggleRebuildLabels(json.id);
+					}
 					$("#rebuilding-text-" + json.id).html(
 						($rebuildingMsg.length == Strings.REBUILDING_MESSAGE.length + 3) ? Strings.REBUILDING_MESSAGE : $rebuildingMsg + "."
 					);
