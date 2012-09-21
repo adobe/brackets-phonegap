@@ -527,6 +527,12 @@ define(function (require, exports, module) {
         eve.on("pgb.success.status", function(json) {
         	var finished = true,
         		status;
+
+        	// Assoicate new projects with this folder
+        	if (json.build_count == null){
+        		linkedProjectId = json.id;
+        	}
+
         	for (var os in json.status) {
         		status = json.status[os];
         		if (status == "pending") finished = false;
