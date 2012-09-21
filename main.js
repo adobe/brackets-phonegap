@@ -217,7 +217,7 @@ define(function (require, exports, module) {
 		        xhr.setRequestHeader("Cache-Control", "no-cache");
 		        var form = new FormData();
 		        form.append("file", zipFile, "file.zip");
-		        form.append("data", '{"title":"'+ id +'","create_method":"file"}');
+		        form.append("data", '{"title":"'+ id +'","create_method":"file", "hydrates":"true"}');
 		        xhr.send(form);
 	    	}	
 		}
@@ -435,6 +435,8 @@ define(function (require, exports, module) {
 
 		});
 		eve.on("pgb.click", function (e) {
+			console.log("pgb.click");
+			console.log(e.target);
 			var span = e.target;
 			if (!String(span.id).indexOf("pgb-app")) {
 				var data = $(span).attr("data-download");
@@ -568,6 +570,7 @@ define(function (require, exports, module) {
         	if (finished) {
         		toggleRebuildLabels(json.id);
 				showAlert(Strings.REBUILT_SUCCESS_MESSAGE, false, null, true);
+				eve("pgb.list");
         	} else {
         		
         		var $rebuildingMsg = $("#rebuilding-text-" + json.id).html();
