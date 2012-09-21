@@ -168,7 +168,6 @@ define(function (require, exports, module) {
 
 		function deleteApp(id) {
 			var id = pendingDelete;
-			console.log("Delete has been called");
 			var xhr = new XMLHttpRequest();
 			xhr.open("DELETE", "https://build.phonegap.com/api/v1/apps/" + id + "?auth_token=" + token, true);
 		 	xhr.setRequestHeader("Cache-Control", "no-cache");
@@ -213,7 +212,6 @@ define(function (require, exports, module) {
 		        form.append("file", zipFile, "file.zip");
 		        xhr.send(form);
 	    	} else {
-	    		console.log("Creating a new project.");
 	    		var urlToCall = "https://build.phonegap.com/api/v1/apps/?auth_token=" + token;
 	    		xhr.open("POST", urlToCall , true);
 		        xhr.setRequestHeader("Cache-Control", "no-cache");
@@ -437,7 +435,6 @@ define(function (require, exports, module) {
 
 		});
 		eve.on("pgb.click", function (e) {
-			console.log("click fired.")
 			var span = e.target;
 			if (!String(span.id).indexOf("pgb-app")) {
 				var data = $(span).attr("data-download");
@@ -472,7 +469,6 @@ define(function (require, exports, module) {
 					});
 				});				
 			}
-			console.log(span.className);
 			if (span.className.indexOf("pgb-rebuild") > -1) {
 				eve("pgb.rebuild", null, span.getAttribute("data-id"));
 			}
@@ -489,7 +485,6 @@ define(function (require, exports, module) {
 			ajax("api/v1/apps/" + id, "rebuild", "put", null, null, false);
 		});
 		eve.on("pgb.delete", function (id) {
-			console.log("delete fired.");
 			pendingDelete = id;
 			showAlert(Strings.DELETE_CONFIRMATION_MESSAGE, true, "delete", false);
 
