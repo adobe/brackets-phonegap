@@ -416,7 +416,7 @@ define(function (require, exports, module) {
 			$projectContainer.append(linkHtml);
 
 
-			var newItemHTML = "";
+			var newItemHTML = "<p>" + Strings.NEW_DIALOG_MESSAGE	 + "</p>";
 			newItemHTML += '<input placeholder="' + Strings.NEW_DIALOG_APP_NAME + '" id="pgb-new-app-name" type="text">';
 
 			$newContainer.empty();
@@ -507,7 +507,7 @@ define(function (require, exports, module) {
         		// NO-OP. Probably don't have to do anything.
         	}
 			else if (action === Dialogs.DIALOG_BTN_OK) {
-				showAlert("Create new project named" + val +  ".", false, null, false);
+				showAlert(Strings.NEW_ALERT_MESSAGE + " <em>" + val +  "</em>.", false, null, false);
 				updateApp(val);
 			}
         });
