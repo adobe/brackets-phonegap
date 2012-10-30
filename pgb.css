@@ -159,6 +159,11 @@
 	font-size: 1.1em;
 }
 
+#pgb-password {
+	z-index: -1;
+	position: relative;
+}
+
 .pgb-project-label{
 	width: 100%;
 	text-align: left;

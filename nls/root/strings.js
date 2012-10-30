@@ -27,7 +27,7 @@
 define({
     "MENU_NAME"                     : "PhoneGap",
     "COMMAND_NAME"					: "PhoneGap Build",
-    "USERNAME_PLACEHOLDER"			: "Username",
+    "USERNAME_PLACEHOLDER"			: "Email/AdobeId",
     "PASSWORD_PLACEHOLDER"			: "Password",
     "LOGIN_BUTTON_LABEL"			: "Login",
     "LOGIN_FAILED_DIALOG_TITLE"		: "Login Failed",
