@@ -43,6 +43,7 @@ define(function (require, exports, module) {
         Menus          = brackets.getModule("command/Menus"),
         Dialogs		   = brackets.getModule("widgets/Dialogs"),
         FileUtils      = brackets.getModule("file/FileUtils"),
+        ExtensionUtils = brackets.getModule("utils/ExtensionUtils"),
 		eve,
 		format         = (function () {
 		    var tokenRegex = /\{([^\}]+)\}/g,
@@ -83,9 +84,7 @@ define(function (require, exports, module) {
 	    var PGB_COMMAND_ID = "phonegap.build";   // package-style naming to avoid collisions
 	    CommandManager.register(Strings.COMMAND_NAME, PGB_COMMAND_ID, eve.f("pgb.button.click"));
 	
-		var button = $("<a>"),
-			path2 = require.nameToUrl("icon.svg");
-		path2 = path2.substring(0, path2.indexOf("icon.svg["));
+		var button = $("<a>");
 		
 		function zipProject(id) {
 			var rootPath = ProjectManager.getProjectRoot().fullPath,
@@ -221,14 +220,15 @@ define(function (require, exports, module) {
 		        xhr.send(form);
 	    	}	
 		}
-
+		
+		ExtensionUtils.loadStyleSheet(module, "pgb.css");
+		
 		button.attr({
 			title: Strings.COMMAND_NAME,
 			id: "pgb-btn",
 			href: "#",
 			"class": "disabled"
-		}).html('<link rel="stylesheet" href="' + path2 + 'pgb.css">')
-		.click(eve.f("pgb.button.click"));
+		}).click(eve.f("pgb.button.click"));
 		button.insertAfter("#toolbar-go-live");
 	
 		var $panel = $('<div id="pgb-panel" class="bottom-panel">\
