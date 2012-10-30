@@ -520,7 +520,8 @@ define(function (require, exports, module) {
 			else if (val == -1) { // Unlinking
 				linkedProjectId = null;
 			} else if (action === Dialogs.DIALOG_BTN_OK) {
-				linkedProjectId = val;
+				// RCS - force this to be cast as a number so we don't upload a new project after linking our code (fix for #30)
+				linkedProjectId = Number(val);
 				showAlert(Strings.LINK_SUCCESSFUL_MESSAGE + Strings.SEND_FILES_MENU_ENTRY + ".", false, null, false);
 			}
         });
