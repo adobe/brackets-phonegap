@@ -241,7 +241,7 @@ define(function (require, exports, module) {
 				<div id="pgb-anim">&nbsp;</div>\
 			</div>'),
 			anim = $("#pgb-anim", $panel);
-		$(".content").append($panel);
+		$panel.insertBefore("#status-bar");
 		$(".close", $panel).click(eve.f("pgb.panel.close"));
 
 		var $tableContainer = $(".table-container", $panel),
