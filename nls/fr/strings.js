@@ -27,7 +27,7 @@
 define({
 	"MENU_NAME": "PhoneGap",
 	"COMMAND_NAME": "PhoneGap Build",
-	"USERNAME_PLACEHOLDER": "Courrier Électronique/AdobeId",
+	"USERNAME_PLACEHOLDER": "Adresse électronique/ID Adobe",
 	"PASSWORD_PLACEHOLDER": "Mot de passe",
 	"LOGIN_BUTTON_LABEL": "Se connecter",
 	"LOGIN_FAILED_DIALOG_TITLE": "Echec de la connexion",
@@ -46,11 +46,11 @@ define({
 	"REBUILDING_MESSAGE": "Regénération",
 	"REBUILDING_SUCCESS_MESSAGE": "Votre projet est en cours de regénération. Cliquez sur le nom du projet pour ouvrir la page de l’application dans votre navigateur.",
 	"REBUILT_SUCCESS_MESSAGE": "La regénération de votre projet est terminée.",
-	"NEW_PROJECT_OPTION": "[DT] !é=Create new PhoneGap Build project=!",
-	"NEW_DIALOG_TITLE": "[DS] !é=New PhoneGap Build Project=!",
-	"NEW_DIALOG_MESSAGE": "[DR] !é=Create a new PhoneGap Build project based on the current folder.=!",
-	"NEW_DIALOG_APP_NAME": "[DQ] !é=App Name=!",
-	"NEW_ALERT_MESSAGE": "[DP] !é=Created a new PhoneGap Build project named=!",
+	"NEW_PROJECT_OPTION": "Créer un projet PhoneGap Build",
+	"NEW_DIALOG_TITLE": "Nouveau projet PhoneGap Build",
+	"NEW_DIALOG_MESSAGE": "Créez un projet PhoneGap Build à partir du dossier en cours.",
+	"NEW_DIALOG_APP_NAME": "Nom de l’application",
+	"NEW_ALERT_MESSAGE": "Nouveau projet PhoneGap Build créé sous le nom",
 	"DELETE_LINK": "Supprimer",
-	"DELETE_CONFIRMATION_MESSAGE": "[DN] !é=Are you sure you want to delete this project?=!"
+	"DELETE_CONFIRMATION_MESSAGE": "Voulez-vous vraiment supprimer ce projet ?"
 });
