@@ -35,13 +35,27 @@ require.config({
 define(function (require, exports, module) {
     "use strict";
 
-	var Strings = require("strings");
+	var Strings = require("strings"),
+        toolbarHTML     = require("text!html/toolbar.html"),
+        popoverTemplate = require("text!html/popover.html"),
+        dialogTemplate  = require("text!html/diaog-template.html"),
+        popoverHTML     = Mustache.render(popoverTemplate),
+        $toolbarIcon    = $(toolbarHTML),
+        $popover        = $(popoverHTML),
+        $body           = $("body");
 
+    var ANIMATION_DURATION          = 75,
+        THANKS_DURATION             = 2000,
+        POPOVER_OFFSET_MAGIC_NUMBER = -10,
+        SHOW_POPOVER_CLASS          = "pgb-alert-show",
+        DISABLE_TOOLBAR_CLASS       = "pgb-alert-disabled";    
+    
     var CommandManager = brackets.getModule("command/CommandManager"),
 		ProjectManager = brackets.getModule("project/ProjectManager"),
 		EditorManager  = brackets.getModule("editor/EditorManager"),
         Menus          = brackets.getModule("command/Menus"),
         Dialogs		   = brackets.getModule("widgets/Dialogs"),
+        DefaultDialogs = brackets.getModule("widgets/DefaultDialogs"),
         FileUtils      = brackets.getModule("file/FileUtils"),
         ExtensionUtils = brackets.getModule("utils/ExtensionUtils"),
 		eve,
@@ -278,23 +292,38 @@ define(function (require, exports, module) {
 		 * @autoClose   Whether or not to automatically close this alert in 5 seconds.
 		 */
 		function showAlert(message, showButtons, name, autoClose) {
-			$(".alert-message").alert("close"); // In case one is already open.
-			var $alert = $("<div>").css({display:"none",position:"absolute",top:0,left:$("#sidebar").css("width"),right:0,"z-index":$("#main-toolbar").css("z-index")+1}).addClass("alert-message pgb fade in").append( $("<button>").attr({"class":"close", "type":"button", "data-dismiss":"alert"}).html("&times;") );
-			$alert.append($("<p>").html(message));
-			if (showButtons) {
-				$alert.append($("<a>").addClass("btn pgb").html("OK").click(function(e) {$(".alert-message").alert("close");eve("pgb.alert." + name + ".ok")}));
-				$alert.append( $("<a>").addClass("btn danger pgb").html("Cancel").click(function(e) {$(".alert-message").alert("close");eve("pgb.alert." + name + ".cancel")}));				
-			} else { // Make it closable by clicking anywhere.
-				$alert.click(function(e) {$(".alert-message").alert("close")});
-			}
-			if (autoClose) {
-				setTimeout(function() { $(".alert-message").alert("close"); }, 5000);
-			}
-			$("#main-toolbar").after($alert);
-			$(".alert-message").alert();
-			$alert.fadeIn("fast");
+            var toobarIconOffset = $toolbarIcon.offset(),
+            popoverTop = toobarIconOffset.top - POPOVER_OFFSET_MAGIC_NUMBER;
+
+            // Dynamically position the popover according to the height of the toolbar icon        
+            $popover
+                .css("top", popoverTop)
+                .addClass(SHOW_POPOVER_CLASS);
+        
+        
+            // Dismiss the popover on click or keydown events that aren't on the
+            // popover or the toolbar icon.
+            $body.on("click.pgb-alert keydown.pgb-alert", function (event) {
+                var $target = $(event.target);
+                if ($popover.find($target).length === 0 && $target !== $toolbarIcon) {
+                    hideAlert();
+                }
+            });
+            
+            $(".alert-message").alert("close"); // In case one is already open.
+			var $alert = $(popoverTemplate);
+                $(".pgb-alert-body").html(message);
+                $alert.click(function(e) {hideAlert()});
+//			if (autoClose) {
+//				setTimeout(function() { hideAlert(); }, 5000);
+//			}
 		}
 
+        function hideAlert() {
+            $popover.removeClass(SHOW_POPOVER_CLASS);
+            $body.off(".pgb-alert");
+        }        
+        
 		function toggleRebuildLabels(id) {
 			$("#rebuild-link-" + id).toggle();
 			$("#rebuilding-text-" + id).toggle();
@@ -358,7 +387,17 @@ define(function (require, exports, module) {
 		var PGB_NEW_COMMAND_ID = "phonegap.build.new";
 
 		eve.on("pgb.success.login", function (json) {
-			token = json.token;
+            // Append the popover and handle the escape key
+            $popover
+                .appendTo("body")
+                .on("keydown", function (event) {
+                    if (event.keyCode === KeyEvent.DOM_VK_ESCAPE) {
+                        hidePopover();
+                        return false;
+                    }
+                });			
+            
+            token = json.token;
 
 	      	var pgMenu = Menus.addMenu(Strings.MENU_NAME, PGB_MENU_ID);
 
@@ -498,7 +537,7 @@ define(function (require, exports, module) {
 		});
 		eve.on("pgb.success.rebuild", function (json) {
 			eve("pgb.success.status", null, json);
-			showAlert(Strings.REBUILDING_SUCCESS_MESSAGE, false, null, true);
+            showAlert(Strings.REBUILDING_SUCCESS_MESSAGE, false, null, true);
 		});
 		eve.on("pgb.failure.rebuild", function () {
 			console.log("pgb.failure.rebuild");
@@ -507,10 +546,10 @@ define(function (require, exports, module) {
             brackets.app.openURLInDefaultBrowser(function (err) {}, url);
         });
         eve.on("pgb.link", function() {
-			Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.LINK_DIALOG_TITLE, $projectContainer).done(eve.f("pgb.close.link"));
+            Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.LINK_DIALOG_TITLE, $projectContainer.html()).done(eve.f("pgb.close.link"));
         });
         eve.on("pgb.new", function() {
-			Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.NEW_DIALOG_TITLE, $newContainer).done(eve.f("pgb.close.new"));
+			Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.NEW_DIALOG_TITLE, $newContainer.html()).done(eve.f("pgb.close.new"));
         });
         eve.on("pgb.close.link", function(action) {
         	var val = $("input[name=pgb-projects]:checked", $projectContainer).val();
