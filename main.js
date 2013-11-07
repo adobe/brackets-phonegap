@@ -32,10 +32,13 @@ require.config({
     locale: navigator.language
 });
 
+var brackets_phonegap_linked_project_Id = 0;
+
 define(function (require, exports, module) {
     "use strict";
 
 	var Strings = require("strings");
+    var ProjectListTemplate    = require("text!project-list.html");
 
     var CommandManager = brackets.getModule("command/CommandManager"),
 		ProjectManager = brackets.getModule("project/ProjectManager"),
@@ -251,6 +254,7 @@ define(function (require, exports, module) {
 			token,
 			linkedProjectId,
 			pendingDelete,
+            projects,
 			platforms = ["ios", "android", "winphone", "blackberry", "webos", "symbian"];
 
 		function ajax(url, name, type, username, password, showProgress) {
@@ -278,6 +282,7 @@ define(function (require, exports, module) {
 		 * @autoClose   Whether or not to automatically close this alert in 5 seconds.
 		 */
 		function showAlert(message, showButtons, name, autoClose) {
+            console.log("Alert Called");
 			$(".alert-message").alert("close"); // In case one is already open.
 			var $alert = $("<div>").css({display:"none",position:"absolute",top:0,left:$("#sidebar").css("width"),right:0,"z-index":$("#main-toolbar").css("z-index")+1}).addClass("alert-message pgb fade in").append( $("<button>").attr({"class":"close", "type":"button", "data-dismiss":"alert"}).html("&times;") );
 			$alert.append($("<p>").html(message));
@@ -383,6 +388,7 @@ define(function (require, exports, module) {
 		});
 		eve.on("pgb.success.list", function (json) {
 			json.apps.sort(function (a,b) {if (a.title < b.title) return -1; if (a.title > b.title) return 1; return 0; });
+            projects = json.apps;
 			var html = '<table class="condensed-table">';
 			for (var i = 0; i < json.apps.length; i++) {
 				var row = "",
@@ -507,22 +513,22 @@ define(function (require, exports, module) {
             brackets.app.openURLInDefaultBrowser(function (err) {}, url);
         });
         eve.on("pgb.link", function() {
-			Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.LINK_DIALOG_TITLE, $projectContainer).done(eve.f("pgb.close.link"));
+            var m_opts = {title:Strings.LINK_DIALOG_TITLE, 
+                            instructions: Strings.LINK_DIALOG_INSTRUCTIONS,
+                            unlink_text: Strings.UNLINK_OPTION,
+                            projects:projects,
+                            dialog_button: Dialogs.DIALOG_BTN_OK};
+            var renderedTemplate = Mustache.render(ProjectListTemplate, m_opts);
+			Dialogs.showModalDialogUsingTemplate(renderedTemplate).done(eve.f("pgb.close.link"));
         });
         eve.on("pgb.new", function() {
 			Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.NEW_DIALOG_TITLE, $newContainer).done(eve.f("pgb.close.new"));
         });
         eve.on("pgb.close.link", function(action) {
-        	var val = $("input[name=pgb-projects]:checked", $projectContainer).val();
-        	if (action === Dialogs.DIALOG_BTN_CANCEL) {
-        		// NO-OP. Probably don't have to do anything.
-        	}
-			else if (val == -1) { // Unlinking
-				linkedProjectId = null;
-			} else if (action === Dialogs.DIALOG_BTN_OK) {
-				// RCS - force this to be cast as a number so we don't upload a new project after linking our code (fix for #30)
-				linkedProjectId = Number(val);
-				showAlert(Strings.LINK_SUCCESSFUL_MESSAGE + Strings.SEND_FILES_MENU_ENTRY + ".", false, null, false);
+            console.log(brackets_phonegap_linked_project_Id);
+        	if (action === Dialogs.DIALOG_BTN_OK) {
+				//TODO: Redo the Alert system, maybe using Brackets built in UI that wasn't available before. 
+                //showAlert(Strings.LINK_SUCCESSFUL_MESSAGE + Strings.SEND_FILES_MENU_ENTRY + ".", false, null, false);
 			}
         });
          eve.on("pgb.close.new", function(action) {
