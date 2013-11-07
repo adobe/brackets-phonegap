@@ -389,54 +389,6 @@ define(function (require, exports, module) {
 		eve.on("pgb.success.list", function (json) {
 			json.apps.sort(function (a,b) {if (a.title < b.title) return -1; if (a.title > b.title) return 1; return 0; });
             projects = json.apps;
-			var html = '<table class="condensed-table">';
-			for (var i = 0; i < json.apps.length; i++) {
-				var row = "",
-					app = json.apps[i],
-					projectIcon = "";
-
-				if (app.icon.filename !== null) {
-					projectIcon = '<img src="https://build.phonegap.com{icon.link}" height="20" alt="icon" style="margin: -5px">';
-				} else {
-					projectIcon = '<span class="icon" style="margin-left: -5px"></span>';
-				}
-
-				row += '<tr><td>' + projectIcon + '</td><td><a href="#" data-url="https://build.phonegap.com/apps/{id}" class="project-link">{title}</a></td><td>';
-				platforms.forEach(function(val, index) {
-					row += '<span data-download="{download.'+val+'}" id="pgb-app-'+val+'-{id}" class="icon '+val+'-{status.'+val+'}"></span>';
-				});
-				row += '</td><td><progress valie="0" max="100" class="pgb-upload-progress" id="pgb-progress-{id}"></td>';
-				row += '<td class="pgb-desc" style="width:75px;"><a href="#" class="pgb-rebuild btn btn-mini primary" data-id="{id}" id="rebuild-link-{id}">' + Strings.REBUILD_LINK + '</a><span style="display:none" id="rebuilding-text-{id}">' + Strings.REBUILDING_MESSAGE + '</span></td>';
-				row += '<td class="pgb-desc" style="width:75px;"><a href="#" class="pgb-delete btn btn-mini danger" data-id="{id}" id="delete-link-{id}">' + Strings.DELETE_LINK + '</a></td></tr>';
-				html += format(row, app);
-			}
-			html += "</table>";
-			$tableContainer.html(html);
-			$tableContainer.click(eve.f("pgb.click"));
-            $(".project-link").click(function (e) {
-                eve("pgb.url.open", null, $(e.target).attr("data-url"));
-            });
-
-            var $linkDialogInstructions = $("<p>").attr("id", "pgb-link-dialog-instructions").append(Strings.LINK_DIALOG_INSTRUCTIONS);
-			var linkHtml = '<table class="condensed-table">';
-			linkHtml += '<tr><td><input class="pgb-project-radio" type="radio" name="pgb-projects" value="-1" id="pgb-unlink-radio" checked/></td><td><label for="pgb-unlink-radio" class="pgb-project-label">' + Strings.UNLINK_OPTION + '</label></td></tr>';
-			for (var i = 0; i < json.apps.length; i++) {
-				var app = json.apps[i];
-				linkHtml += format('<tr><td><input class="pgb-project-radio" type="radio" name="pgb-projects" id="input-{id}" value="{id}"/></td>\
-									<td><label for="input-{id}" class="pgb-project-label"><span class="project-title" for="cb-{id}">{title}</span><p>{description}</p></label></td></tr>\n', app);
-			}
-			linkHtml += "</table></div>";
-			linkHtml = linkHtml.replace(/<p>null<\/p>/g, "<p></p>");
-			$projectContainer.empty();
-			$projectContainer.append($linkDialogInstructions);
-			$projectContainer.append(linkHtml);
-
-
-			var newItemHTML = "<p>" + Strings.NEW_DIALOG_MESSAGE	 + "</p>";
-			newItemHTML += '<input placeholder="' + Strings.NEW_DIALOG_APP_NAME + '" id="pgb-new-app-name" type="text">';
-
-			$newContainer.empty();
-			$newContainer.append(newItemHTML);
 
 
 		});
