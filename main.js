@@ -38,7 +38,8 @@ define(function (require, exports, module) {
     "use strict";
 
 	var Strings = require("strings");
-    var ProjectListTemplate    = require("text!project-list.html");
+    var ProjectListTemplate = require("text!templates/project-list.html"),
+        LoginTemplate       = require("text!templates/login.html");
 
     var CommandManager = brackets.getModule("command/CommandManager"),
 		ProjectManager = brackets.getModule("project/ProjectManager"),
@@ -337,12 +338,15 @@ define(function (require, exports, module) {
 		});
 		
 		eve.on("pgb.before.login", function () {
-			var $form = $('<form action="#" style="text-align: center">\
-				<input type="email" id="pgb-username" name="username" placeholder="' + Strings.USERNAME_PLACEHOLDER + '"><br><br>\
-				<input type="password" name="password" id="pgb-password" placeholder="' + Strings.PASSWORD_PLACEHOLDER + '"><br><br>\
-				<input type="submit" class="btn primary" value=" ' + Strings.LOGIN_BUTTON_LABEL + ' ">\
-			</form>');
-			$tableContainer.empty().append($form);
+            
+             var m_opts = {username_placeholder:Strings.USERNAME_PLACEHOLDER, 
+                            password_placeholder: Strings.PASSWORD_PLACEHOLDER,
+                            login_button: Strings.LOGIN_BUTTON_LABEL};
+            var renderedTemplate = Mustache.render(LoginTemplate, m_opts);
+            
+            
+			$tableContainer.empty().append(renderedTemplate);
+            var $form = $("#pgb-login-form");
 			var inputs = $("input", $form);
 			$form.on("submit", function (e) {
 				e.preventDefault();
