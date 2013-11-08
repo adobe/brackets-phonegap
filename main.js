@@ -509,7 +509,7 @@ define(function (require, exports, module) {
 		});
 		eve.on("pgb.delete", function (id) {
 			pendingDelete = id;
-			showAlert(Strings.DELETE_CONFIRMATION_MESSAGE, true, "delete", false);
+            Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.SEND_FILES_MENU_ENTRY, Strings.DELETE_CONFIRMATION_MESSAGE).done(eve.f("pgb.alert.delete"));
 
 
 
@@ -571,11 +571,14 @@ define(function (require, exports, module) {
 				updateApp();
 			}
         });
-        eve.on("pgb.alert.delete.ok", function(id) {
-        	deleteApp(id);
-        });
-        eve.on("pgb.alert.delete.cancel", function() {
-        	// NO-OP
+        eve.on("pgb.alert.delete", function(action) {
+            if (action === Dialogs.DIALOG_BTN_CANCEL) {
+        		// NO-OP. Probably don't have to do anything.
+        	}
+			else if (action === Dialogs.DIALOG_BTN_OK) {
+				deleteApp(pendingDelete);
+			}
+        	
         });
         eve.on("pgb.success.status", function(json) {
         	var finished = true,
