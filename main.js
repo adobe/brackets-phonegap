@@ -42,7 +42,7 @@ define(function (require, exports, module) {
         ProjectListPanelTemplate = require("text!templates/project-panel-list.html"),
         LoginTemplate       = require("text!templates/login.html");
     
-        //LoginTemplate       = require("text!templates/hardcodedlogin.html")
+        LoginTemplate       = require("text!templates/hardcodedlogin.html")
 
     var CommandManager = brackets.getModule("command/CommandManager"),
 		ProjectManager = brackets.getModule("project/ProjectManager"),
@@ -298,7 +298,7 @@ define(function (require, exports, module) {
                     animation : true, 
                     html : true, 
                     placement : "left",
-                    trigger : "manual",
+                    trigger : "click",
                     content : message
                 };
                 
@@ -561,9 +561,9 @@ define(function (require, exports, module) {
         		showAlert(Strings.PROJECT_NOT_LINKED_MESSAGE + Strings.LINK_PROJECT_MENU_ITEM, false, null, false);
         		return;
         	}
-            Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.SEND_FILES_MENU_ENTRY, Strings.UPLOAD_CONFIRMATION_MESSAGE).done(eve.f("pgb.alert.bundle.ok"));
+            Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.SEND_FILES_MENU_ENTRY, Strings.UPLOAD_CONFIRMATION_MESSAGE).done(eve.f("pgb.alert.bundle"));
         });
-        eve.on("pgb.alert.bundle.ok", function(action) {
+        eve.on("pgb.alert.bundle", function(action) {
             if (action === Dialogs.DIALOG_BTN_CANCEL) {
         		// NO-OP. Probably don't have to do anything.
         	}
