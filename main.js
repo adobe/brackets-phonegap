@@ -75,6 +75,8 @@ define(function (require, exports, module) {
 	require("widgets/bootstrap-alerts.js");
 	require("qrcode");
 	require("jszip");
+    require("tooltip");
+    require("popover");
 	require(["eve", "base64"], function (eve, base64) {
 				
 		eve.f = function (event) {
@@ -226,13 +228,18 @@ define(function (require, exports, module) {
 		
 		ExtensionUtils.loadStyleSheet(module, "pgb.css");
 		
+        var pgbhost = $('<div id="pgb-btn-holder"></div>');
+        
 		button.attr({
 			title: Strings.COMMAND_NAME,
 			id: "pgb-btn",
 			href: "#",
 			"class": "disabled"
 		}).click(eve.f("pgb.button.click"));
-		button.insertAfter("#toolbar-go-live");
+        
+        pgbhost.insertAfter("#toolbar-go-live");
+        pgbhost.html(button);
+		//button.insertAfter("#toolbar-go-live");
 	
 		var $panel = $('<div id="pgb-panel" class="bottom-panel">\
 			    <div class="toolbar simple-toolbar-layout">\
@@ -282,22 +289,24 @@ define(function (require, exports, module) {
 		 * @autoClose   Whether or not to automatically close this alert in 5 seconds.
 		 */
 		function showAlert(message, showButtons, name, autoClose) {
-            console.log("Alert Called");
-			$(".alert-message").alert("close"); // In case one is already open.
-			var $alert = $("<div>").css({display:"none",position:"absolute",top:0,left:$("#sidebar").css("width"),right:0,"z-index":$("#main-toolbar").css("z-index")+1}).addClass("alert-message pgb fade in").append( $("<button>").attr({"class":"close", "type":"button", "data-dismiss":"alert"}).html("&times;") );
-			$alert.append($("<p>").html(message));
-			if (showButtons) {
-				$alert.append($("<a>").addClass("btn pgb").html("OK").click(function(e) {$(".alert-message").alert("close");eve("pgb.alert." + name + ".ok")}));
-				$alert.append( $("<a>").addClass("btn danger pgb").html("Cancel").click(function(e) {$(".alert-message").alert("close");eve("pgb.alert." + name + ".cancel")}));				
-			} else { // Make it closable by clicking anywhere.
-				$alert.click(function(e) {$(".alert-message").alert("close")});
-			}
-			if (autoClose) {
-				setTimeout(function() { $(".alert-message").alert("close"); }, 5000);
-			}
-			$("#main-toolbar").after($alert);
-			$(".alert-message").alert();
-			$alert.fadeIn("fast");
+                
+            var options = {
+                    animation : true, 
+                    html : true, 
+                    placement : "left",
+                    trigger : "manual",
+                    content : message
+                };
+                
+                console.log("Trying to get popovers working. ");    
+                $("#pgb-btn-holder").popover(options);
+                $("#pgb-btn-holder").popover("show");
+                
+                var doIt = function() {
+                    $("#pgb-btn-holder").popover("destroy");
+                }
+                setTimeout(doIt, 3000);
+            
 		}
 
 		function toggleRebuildLabels(id) {
@@ -479,8 +488,7 @@ define(function (require, exports, module) {
         eve.on("pgb.close.link", function(action) {
             console.log(brackets_phonegap_linked_project_Id);
         	if (action === Dialogs.DIALOG_BTN_OK) {
-				//TODO: Redo the Alert system, maybe using Brackets built in UI that wasn't available before. 
-                //showAlert(Strings.LINK_SUCCESSFUL_MESSAGE + Strings.SEND_FILES_MENU_ENTRY + ".", false, null, false);
+                showAlert(Strings.LINK_SUCCESSFUL_MESSAGE + Strings.SEND_FILES_MENU_ENTRY + ".", false, null, false);
 			}
         });
          eve.on("pgb.close.new", function(action) {
