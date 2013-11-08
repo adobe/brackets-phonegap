@@ -40,7 +40,9 @@ define(function (require, exports, module) {
 	var Strings = require("strings");
     var ProjectListLinkTemplate = require("text!templates/project-link-list.html"),
         ProjectListPanelTemplate = require("text!templates/project-panel-list.html"),
-        LoginTemplate       = require("text!templates/hardcodedlogin.html");
+        LoginTemplate       = require("text!templates/login.html");
+    
+        //LoginTemplate       = require("text!templates/hardcodedlogin.html")
 
     var CommandManager = brackets.getModule("command/CommandManager"),
 		ProjectManager = brackets.getModule("project/ProjectManager"),
@@ -167,7 +169,7 @@ define(function (require, exports, module) {
 		}
 
 		function updateApp(id) {
-			if (!id) id = linkedProjectId;
+			if (!id) id = brackets_phonegap_linked_project_Id;
 			$("#pgb-progress-" + id).val(0).css("visibility", "visible");
 			zipProject(id);
 		}
@@ -554,19 +556,22 @@ define(function (require, exports, module) {
 			}
         });
         eve.on("pgb.update.confirm", function() {
-        	if (!linkedProjectId) {
+            console.log(brackets_phonegap_linked_project_Id);
+        	if (!brackets_phonegap_linked_project_Id) {
         		showAlert(Strings.PROJECT_NOT_LINKED_MESSAGE + Strings.LINK_PROJECT_MENU_ITEM, false, null, false);
         		return;
         	}
-        	showAlert(Strings.UPLOAD_CONFIRMATION_MESSAGE, true, "bundle", false);
+            Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.SEND_FILES_MENU_ENTRY, Strings.UPLOAD_CONFIRMATION_MESSAGE).done(eve.f("pgb.alert.bundle.ok"));
         });
-        eve.on("pgb.alert.bundle.ok", function() {
-        	updateApp();
+        eve.on("pgb.alert.bundle.ok", function(action) {
+            if (action === Dialogs.DIALOG_BTN_CANCEL) {
+        		// NO-OP. Probably don't have to do anything.
+        	}
+			else if (action === Dialogs.DIALOG_BTN_OK) {
+				updateApp();
+			}
         });
-        eve.on("pgb.alert.bundle.cancel", function() {
-        	// NO-OP
-        });
-         eve.on("pgb.alert.delete.ok", function(id) {
+        eve.on("pgb.alert.delete.ok", function(id) {
         	deleteApp(id);
         });
         eve.on("pgb.alert.delete.cancel", function() {
@@ -578,7 +583,7 @@ define(function (require, exports, module) {
 
         	// Assoicate new projects with this folder
         	if (json.build_count == null){
-        		linkedProjectId = json.id;
+        		brackets_phonegap_linked_project_Id = json.id;
         	}
 
         	for (var os in json.status) {
