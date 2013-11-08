@@ -38,7 +38,7 @@ define(function (require, exports, module) {
     "use strict";
 
 	var Strings = require("strings");
-    var ProjectListTemplate = require("text!templates/project-list.html"),
+    var ProjectListTemplate = require("text!templates/project-link-list.html"),
         LoginTemplate       = require("text!templates/login.html");
 
     var CommandManager = brackets.getModule("command/CommandManager"),
