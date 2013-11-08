@@ -40,7 +40,7 @@ define(function (require, exports, module) {
 	var Strings = require("strings");
     var ProjectListLinkTemplate = require("text!templates/project-link-list.html"),
         ProjectListPanelTemplate = require("text!templates/project-panel-list.html"),
-        LoginTemplate       = require("text!templates/login.html");
+        LoginTemplate       = require("text!templates/hardcodedlogin.html");
 
     var CommandManager = brackets.getModule("command/CommandManager"),
 		ProjectManager = brackets.getModule("project/ProjectManager"),
@@ -77,8 +77,8 @@ define(function (require, exports, module) {
 	require("widgets/bootstrap-alerts.js");
 	require("qrcode");
 	require("jszip");
-    require("tooltip");
-    require("popover");
+    require("widgets/bootstrap-tooltip.js");
+    require("widgets/bootstrap-popover.js");
 	require(["eve", "base64"], function (eve, base64) {
 				
 		eve.f = function (event) {
@@ -303,11 +303,12 @@ define(function (require, exports, module) {
                 console.log("Trying to get popovers working. ");    
                 $("#pgb-btn-holder").popover(options);
                 $("#pgb-btn-holder").popover("show");
-                
+                $("#pgb-btn-holder + .popover").css("top", "20px");
+                $("#pgb-btn-holder + .popover .arrow").css("top", "40%");
                 var doIt = function() {
                     $("#pgb-btn-holder").popover("destroy");
                 }
-                setTimeout(doIt, 3000);
+                setTimeout(doIt, 5000);
             
 		}
 
