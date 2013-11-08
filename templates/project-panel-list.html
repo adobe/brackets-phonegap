@@ -1,0 +1,21 @@
+<table class="condensed-table" id="pgb-panel-project-list-table">
+    {{#projects}}
+        <tr>
+            <td><img src="{{iconlink}}" height="20" width="20" alt="icon"></td>
+            <td><a href="#" data-url="https://build.phonegap.com/apps/{{id}}" class="project-link">{{title}}</a></td>
+            <td>
+                {{#platforms}}
+                    <span data-download="{{download}}" id="pgb-app-{{os}}-{{id}}" class="icon {{os}}-{{status}}"></span>
+                {{/platforms}} 
+            </td>
+            <td><progress valie="0" max="100" class="pgb-upload-progress" id="pgb-progress-{{id}}"></td>
+            <td class="pgb-desc" style="width:75px;">
+                <a href="#" class="pgb-rebuild btn btn-mini primary" data-id="{{id}}" id="rebuild-link-{{id}}">{{Strings.REBUILD_LINK}}</a>
+                <span style="display:none" id="rebuilding-text-{id}">{{Strings.REBUILDING_MESSAGE }}</span>
+            </td>    
+            <td class="pgb-desc" style="width:75px;">
+                <a href="#" class="pgb-delete btn btn-mini danger" data-id="{{id}}" id="delete-link-{{id}}">{{Strings.DELETE_LINK}}</a>
+            </td>    
+        </tr>            
+    {{/projects}}
+</table>

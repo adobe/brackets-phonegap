@@ -38,7 +38,8 @@ define(function (require, exports, module) {
     "use strict";
 
 	var Strings = require("strings");
-    var ProjectListTemplate = require("text!templates/project-link-list.html"),
+    var ProjectListLinkTemplate = require("text!templates/project-link-list.html"),
+        ProjectListPanelTemplate = require("text!templates/project-panel-list.html"),
         LoginTemplate       = require("text!templates/login.html");
 
     var CommandManager = brackets.getModule("command/CommandManager"),
@@ -402,47 +403,52 @@ define(function (require, exports, module) {
 		eve.on("pgb.success.list", function (json) {
 			json.apps.sort(function (a,b) {if (a.title < b.title) return -1; if (a.title > b.title) return 1; return 0; });
             projects = json.apps;
-
-            var html = '<table class="condensed-table">';
-		for (var i = 0; i < json.apps.length; i++) {
-			var row = "",
-				app = json.apps[i],
-				projectIcon = "";
-
-			if (app.icon.filename !== null) {
-				projectIcon = '<img src="https://build.phonegap.com{icon.link}" height="20" alt="icon" style="margin: -5px">';
-			} else {
-				projectIcon = '<span class="icon" style="margin-left: -5px"></span>';
-			}
-
-			row += '<tr><td>' + projectIcon + '</td><td><a href="#" data-url="https://build.phonegap.com/apps/{id}" class="project-link">{title}</a></td><td>';
-			platforms.forEach(function(val, index) {
-				row += '<span data-download="{download.'+val+'}" id="pgb-app-'+val+'-{id}" class="icon '+val+'-{status.'+val+'}"></span>';
-			});
-			row += '</td><td><progress valie="0" max="100" class="pgb-upload-progress" id="pgb-progress-{id}"></td>';
-			row += '<td class="pgb-desc" style="width:75px;"><a href="#" class="pgb-rebuild btn btn-mini primary" data-id="{id}" id="rebuild-link-{id}">' + Strings.REBUILD_LINK + '</a><span style="display:none" id="rebuilding-text-{id}">' + Strings.REBUILDING_MESSAGE + '</span></td>';
-			row += '<td class="pgb-desc" style="width:75px;"><a href="#" class="pgb-delete btn btn-mini danger" data-id="{id}" id="delete-link-{id}">' + Strings.DELETE_LINK + '</a></td></tr>';
-			html += format(row, app);
-		}
-		html += "</table>";
-		$tableContainer.html(html);
-		$tableContainer.click(eve.f("pgb.click"));
-        $(".project-link").click(function (e) {
-            eve("pgb.url.open", null, $(e.target).attr("data-url"));
-        });
-
-
-
-		var newItemHTML = "<p>" + Strings.NEW_DIALOG_MESSAGE	 + "</p>";
-		newItemHTML += '<input placeholder="' + Strings.NEW_DIALOG_APP_NAME + '" id="pgb-new-app-name" type="text">';
-
-		$newContainer.empty();
-		$newContainer.append(newItemHTML);
+            var projectsMassaged = [];
             
             
+            for (var i = 0; i < projects.length; i++) {
+                var app = projects[i];
+                var appMassaged = {};
+                // TODO: add logic to deal with projects without icons.
+                if (app.icon.filename === null) {
+                    appMassaged.iconlink = require.toUrl('./icon-pg.svg');
+                } else {
+                    appMassaged.iconlink = "https://build.phonegap.com" + app.icon.link;
+                }
+                appMassaged.id = app.id;
+                appMassaged.title = app.title;
+                appMassaged.platforms = [];
+                
+                platforms.forEach(function(val, index) {
+                    var platform = {};
+                    platform.os = val;
+                    platform.download = app.download[val];
+                    if (app.status[val] === null) {
+                        platform.status = "error";
+                    } else {
+                        platform.status = app.status[val];
+                    }    
+                    appMassaged.platforms.push(platform);
+			     });
+                projectsMassaged.push(appMassaged);
+                
+            }
+            var m_opts = {Strings:Strings, 
+                            projects: projectsMassaged};
+            var html = Mustache.render(ProjectListPanelTemplate, m_opts);
             
             
-            
+            $tableContainer.html(html);
+            $tableContainer.click(eve.f("pgb.click"));
+            $(".project-link").click(function (e) {
+                eve("pgb.url.open", null, $(e.target).attr("data-url"));
+            });
+    
+            var newItemHTML = "<p>" + Strings.NEW_DIALOG_MESSAGE	 + "</p>";
+            newItemHTML += '<input placeholder="' + Strings.NEW_DIALOG_APP_NAME + '" id="pgb-new-app-name" type="text">';
+    
+            $newContainer.empty();
+            $newContainer.append(newItemHTML);
             
 
 		});
@@ -524,7 +530,7 @@ define(function (require, exports, module) {
                             unlink_text: Strings.UNLINK_OPTION,
                             projects:projects,
                             dialog_button: Dialogs.DIALOG_BTN_OK};
-            var renderedTemplate = Mustache.render(ProjectListTemplate, m_opts);
+            var renderedTemplate = Mustache.render(ProjectListLinkTemplate, m_opts);
 			Dialogs.showModalDialogUsingTemplate(renderedTemplate).done(eve.f("pgb.close.link"));
         });
         eve.on("pgb.new", function() {
