@@ -33,6 +33,7 @@ require.config({
 });
 
 var brackets_phonegap_linked_project_Id = 0;
+var brackets_phonegap_new_project = "";
 
 define(function (require, exports, module) {
     "use strict";
@@ -40,6 +41,7 @@ define(function (require, exports, module) {
 	var Strings = require("strings");
     var ProjectListLinkTemplate = require("text!templates/project-link-list.html"),
         ProjectListPanelTemplate = require("text!templates/project-panel-list.html"),
+        ProjectNewTemplate = require("text!templates/new-project.html"),
         LoginTemplate       = require("text!templates/login.html");
     
         LoginTemplate       = require("text!templates/hardcodedlogin.html")
@@ -343,7 +345,7 @@ define(function (require, exports, module) {
 		
 		eve.on("pgb.before.login", function () {
             
-             var m_opts = {username_placeholder:Strings.USERNAME_PLACEHOLDER, 
+            var m_opts = {username_placeholder:Strings.USERNAME_PLACEHOLDER, 
                             password_placeholder: Strings.PASSWORD_PLACEHOLDER,
                             login_button: Strings.LOGIN_BUTTON_LABEL};
             var renderedTemplate = Mustache.render(LoginTemplate, m_opts);
@@ -412,7 +414,7 @@ define(function (require, exports, module) {
             for (var i = 0; i < projects.length; i++) {
                 var app = projects[i];
                 var appMassaged = {};
-                // TODO: add logic to deal with projects without icons.
+
                 if (app.icon.filename === null) {
                     appMassaged.iconlink = require.toUrl('./icon-pg.svg');
                 } else {
@@ -436,22 +438,18 @@ define(function (require, exports, module) {
                 projectsMassaged.push(appMassaged);
                 
             }
-            var m_opts = {Strings:Strings, 
-                            projects: projectsMassaged};
-            var html = Mustache.render(ProjectListPanelTemplate, m_opts);
-            
-            
-            $tableContainer.html(html);
+            var m_opts_project_list = {Strings:Strings, projects: projectsMassaged};
+            var html_project_list = Mustache.render(ProjectListPanelTemplate, m_opts_project_list);
+            $tableContainer.html(html_project_list);
             $tableContainer.click(eve.f("pgb.click"));
+            
             $(".project-link").click(function (e) {
                 eve("pgb.url.open", null, $(e.target).attr("data-url"));
             });
     
-            var newItemHTML = "<p>" + Strings.NEW_DIALOG_MESSAGE	 + "</p>";
-            newItemHTML += '<input placeholder="' + Strings.NEW_DIALOG_APP_NAME + '" id="pgb-new-app-name" type="text">';
+            
+            
     
-            $newContainer.empty();
-            $newContainer.append(newItemHTML);
             
 
 		});
@@ -537,7 +535,10 @@ define(function (require, exports, module) {
 			Dialogs.showModalDialogUsingTemplate(renderedTemplate).done(eve.f("pgb.close.link"));
         });
         eve.on("pgb.new", function() {
-			Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.NEW_DIALOG_TITLE, $newContainer).done(eve.f("pgb.close.new"));
+            var m_opts_new_project = {Strings:Strings, Dialogs: Dialogs};
+            var html_new_project = Mustache.render(ProjectNewTemplate, m_opts_new_project);
+            
+			Dialogs.showModalDialogUsingTemplate(html_new_project).done(eve.f("pgb.close.new"));
         });
         eve.on("pgb.close.link", function(action) {
             console.log(brackets_phonegap_linked_project_Id);
@@ -546,11 +547,14 @@ define(function (require, exports, module) {
 			}
         });
          eve.on("pgb.close.new", function(action) {
-        	var val = $("#pgb-new-app-name", $newContainer).val();
+            console.log(brackets_phonegap_new_project, action);
+             
+        	var val = brackets_phonegap_new_project;
         	if (action === Dialogs.DIALOG_BTN_CANCEL) {
         		// NO-OP. Probably don't have to do anything.
         	}
 			else if (action === Dialogs.DIALOG_BTN_OK) {
+                
 				showAlert(Strings.NEW_ALERT_MESSAGE + " <em>" + val +  "</em>.", false, null, false);
 				updateApp(val);
 			}
