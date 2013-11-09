@@ -446,12 +446,6 @@ define(function (require, exports, module) {
             $(".project-link").click(function (e) {
                 eve("pgb.url.open", null, $(e.target).attr("data-url"));
             });
-    
-            
-            
-    
-            
-
 		});
 		eve.on("pgb.click", function (e) {
 			console.log("pgb.click");
@@ -507,9 +501,9 @@ define(function (require, exports, module) {
 		});
 		eve.on("pgb.delete", function (id) {
 			pendingDelete = id;
-            Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.SEND_FILES_MENU_ENTRY, Strings.DELETE_CONFIRMATION_MESSAGE).done(eve.f("pgb.alert.delete"));
-
-
+            var title = Strings.SEND_FILES_MENU_ENTRY;
+            var message = Strings.DELETE_CONFIRMATION_MESSAGE;
+            Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, title, message).done(eve.f("pgb.alert.delete"));
 
 		});
 		eve.on("pgb.error.rebuild", function (error) {
@@ -549,18 +543,18 @@ define(function (require, exports, module) {
         		// NO-OP. Probably don't have to do anything.
         	}
 			else if (action === Dialogs.DIALOG_BTN_OK) {
-                
 				showAlert(Strings.NEW_ALERT_MESSAGE + " <em>" + val +  "</em>.", false, null, false);
 				updateApp(val);
 			}
         });
         eve.on("pgb.update.confirm", function() {
-            console.log(brackets_phonegap_linked_project_Id);
         	if (!brackets_phonegap_linked_project_Id) {
         		showAlert(Strings.PROJECT_NOT_LINKED_MESSAGE + Strings.LINK_PROJECT_MENU_ITEM, false, null, false);
         		return;
         	}
-            Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.SEND_FILES_MENU_ENTRY, Strings.UPLOAD_CONFIRMATION_MESSAGE).done(eve.f("pgb.alert.bundle"));
+            var title = Strings.SEND_FILES_MENU_ENTRY;
+            var message = Strings.UPLOAD_CONFIRMATION_MESSAGE;
+            Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, title, message).done(eve.f("pgb.alert.bundle"));
         });
         eve.on("pgb.alert.bundle", function(action) {
             if (action === Dialogs.DIALOG_BTN_CANCEL) {
