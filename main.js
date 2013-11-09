@@ -526,18 +526,13 @@ define(function (require, exports, module) {
             brackets.app.openURLInDefaultBrowser(function (err) {}, url);
         });
         eve.on("pgb.link", function() {
-            var m_opts = {title:Strings.LINK_DIALOG_TITLE, 
-                            instructions: Strings.LINK_DIALOG_INSTRUCTIONS,
-                            unlink_text: Strings.UNLINK_OPTION,
-                            projects:projects,
-                            dialog_button: Dialogs.DIALOG_BTN_OK};
+            var m_opts = {Strings: Strings, projects:projects, Dialogs: Dialogs};
             var renderedTemplate = Mustache.render(ProjectListLinkTemplate, m_opts);
 			Dialogs.showModalDialogUsingTemplate(renderedTemplate).done(eve.f("pgb.close.link"));
         });
         eve.on("pgb.new", function() {
             var m_opts_new_project = {Strings:Strings, Dialogs: Dialogs};
             var html_new_project = Mustache.render(ProjectNewTemplate, m_opts_new_project);
-            
 			Dialogs.showModalDialogUsingTemplate(html_new_project).done(eve.f("pgb.close.new"));
         });
         eve.on("pgb.close.link", function(action) {
