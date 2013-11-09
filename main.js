@@ -40,12 +40,13 @@ define(function (require, exports, module) {
 
 	var Strings = require("strings");
     var ProjectListLinkTemplate = require("text!templates/project-link-list.html"),
+        PanelTemplate = require("text!templates/panel.html"),
         ProjectListPanelTemplate = require("text!templates/project-panel-list.html"),
         ProjectNewTemplate = require("text!templates/new-project.html"),
         LoginTemplate       = require("text!templates/login.html");
     
         LoginTemplate       = require("text!templates/hardcodedlogin.html")
-
+        
     var CommandManager = brackets.getModule("command/CommandManager"),
 		ProjectManager = brackets.getModule("project/ProjectManager"),
 		EditorManager  = brackets.getModule("editor/EditorManager"),
@@ -53,6 +54,7 @@ define(function (require, exports, module) {
         Dialogs		   = brackets.getModule("widgets/Dialogs"),
         FileUtils      = brackets.getModule("file/FileUtils"),
         ExtensionUtils = brackets.getModule("utils/ExtensionUtils"),
+        PanelManager   = brackets.getModule("view/PanelManager"),
 		eve,
 		format         = (function () {
 		    var tokenRegex = /\{([^\}]+)\}/g,
@@ -245,19 +247,13 @@ define(function (require, exports, module) {
         
         pgbhost.insertAfter("#toolbar-go-live");
         pgbhost.html(button);
-		//button.insertAfter("#toolbar-go-live");
-	
-		var $panel = $('<div id="pgb-panel" class="bottom-panel">\
-			    <div class="toolbar simple-toolbar-layout">\
-			        <div class="title">' + Strings.COMMAND_NAME + '</div>\
-			        <div class="title" id="search-result-summary"></div>\
-			        <a href="#" class="close">&times;</a>\
-			    </div>\
-			    <div class="table-container"></div>\
-				<div id="pgb-anim">&nbsp;</div>\
-			</div>'),
-			anim = $("#pgb-anim", $panel);
-		$panel.insertBefore("#status-bar");
+        
+        
+        var m_opts_panel = {Strings: Strings};
+        var html_panel = Mustache.render(PanelTemplate, m_opts_panel);
+        var $panel = PanelManager.createBottomPanel("brackets-phonegap", $(html_panel));
+
+        var anim = $("#pgb-anim", $panel);
 		$(".close", $panel).click(eve.f("pgb.panel.close"));
 
 		var $tableContainer = $(".table-container", $panel),
@@ -351,7 +347,7 @@ define(function (require, exports, module) {
             var renderedTemplate = Mustache.render(LoginTemplate, m_opts);
             
             
-			$tableContainer.empty().append(renderedTemplate);
+			$(".pgb-table-container").append(renderedTemplate);
             var $form = $("#pgb-login-form");
 			var inputs = $("input", $form);
 			$form.on("submit", function (e) {
@@ -440,8 +436,8 @@ define(function (require, exports, module) {
             }
             var m_opts_project_list = {Strings:Strings, projects: projectsMassaged};
             var html_project_list = Mustache.render(ProjectListPanelTemplate, m_opts_project_list);
-            $tableContainer.html(html_project_list);
-            $tableContainer.click(eve.f("pgb.click"));
+            $(".pgb-table-container").html(html_project_list);
+            $(".pgb-table-container").click(eve.f("pgb.click"));
             
             $(".project-link").click(function (e) {
                 eve("pgb.url.open", null, $(e.target).attr("data-url"));
