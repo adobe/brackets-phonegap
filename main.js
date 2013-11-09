@@ -45,7 +45,7 @@ define(function (require, exports, module) {
         ProjectNewTemplate = require("text!templates/new-project.html"),
         LoginTemplate       = require("text!templates/login.html");
     
-        LoginTemplate       = require("text!templates/hardcodedlogin.html")
+        //LoginTemplate       = require("text!templates/hardcodedlogin.html")
         
     var CommandManager = brackets.getModule("command/CommandManager"),
 		ProjectManager = brackets.getModule("project/ProjectManager"),
@@ -341,9 +341,7 @@ define(function (require, exports, module) {
 		
 		eve.on("pgb.before.login", function () {
             
-            var m_opts = {username_placeholder:Strings.USERNAME_PLACEHOLDER, 
-                            password_placeholder: Strings.PASSWORD_PLACEHOLDER,
-                            login_button: Strings.LOGIN_BUTTON_LABEL};
+            var m_opts = {Strings: Strings};
             var renderedTemplate = Mustache.render(LoginTemplate, m_opts);
             
             
