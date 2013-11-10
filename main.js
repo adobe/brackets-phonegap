@@ -38,7 +38,7 @@ var brackets_phonegap_new_project = "";
 define(function (require, exports, module) {
     "use strict";
 
-	var Strings = require("strings");
+	var Strings = require("js/strings");
     var ProjectListLinkTemplate = require("text!templates/project-link-list.html"),
         PanelTemplate = require("text!templates/panel.html"),
         ProjectListPanelTemplate = require("text!templates/project-panel-list.html"),
@@ -81,8 +81,8 @@ define(function (require, exports, module) {
 		})();
 
 	require("widgets/bootstrap-alerts.js");
-	require("qrcode");
-	require("jszip");
+	require("js/qrcode");
+	require("js/jszip");
     require("widgets/bootstrap-tooltip.js");
     require("widgets/bootstrap-popover.js");
 	require(["eve", "base64"], function (eve, base64) {
@@ -234,7 +234,7 @@ define(function (require, exports, module) {
 	    	}	
 		}
 		
-		ExtensionUtils.loadStyleSheet(module, "pgb.css");
+		ExtensionUtils.loadStyleSheet(module, "css/pgb.css");
 		
         var pgbhost = $('<div id="pgb-btn-holder"></div>');
         
@@ -410,7 +410,7 @@ define(function (require, exports, module) {
                 var appMassaged = {};
 
                 if (app.icon.filename === null) {
-                    appMassaged.iconlink = require.toUrl('./icon-pg.svg');
+                    appMassaged.iconlink = require.toUrl('./svg/icon-pg.svg');
                 } else {
                     appMassaged.iconlink = "https://build.phonegap.com" + app.icon.link;
                 }
