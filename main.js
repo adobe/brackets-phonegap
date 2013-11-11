@@ -46,7 +46,7 @@ define(function (require, exports, module) {
         ProjectDeleteTemplate = require("text!templates/delete-project.html"),
         LoginTemplate       = require("text!templates/login.html");
     
-        LoginTemplate       = require("text!templates/hardcodedlogin.html")
+        //LoginTemplate       = require("text!templates/hardcodedlogin.html")
         
     var CommandManager = brackets.getModule("command/CommandManager"),
 		ProjectManager = brackets.getModule("project/ProjectManager"),
