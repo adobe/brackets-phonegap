@@ -43,9 +43,10 @@ define(function (require, exports, module) {
         PanelTemplate = require("text!templates/panel.html"),
         ProjectListPanelTemplate = require("text!templates/project-panel-list.html"),
         ProjectNewTemplate = require("text!templates/new-project.html"),
+        ProjectDeleteTemplate = require("text!templates/delete-project.html"),
         LoginTemplate       = require("text!templates/login.html");
     
-        LoginTemplate       = require("text!templates/hardcodedlogin.html")
+        //LoginTemplate       = require("text!templates/hardcodedlogin.html")
         
     var CommandManager = brackets.getModule("command/CommandManager"),
 		ProjectManager = brackets.getModule("project/ProjectManager"),
@@ -496,10 +497,9 @@ define(function (require, exports, module) {
 		});
 		eve.on("pgb.delete", function (id) {
 			pendingDelete = id;
-            var title = Strings.SEND_FILES_MENU_ENTRY;
-            var message = Strings.DELETE_CONFIRMATION_MESSAGE;
-            Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, title, message).done(eve.f("pgb.alert.delete"));
-
+            var m_opts = {Strings: Strings, projects:projects, Dialogs: Dialogs};
+            var renderedTemplate = Mustache.render(ProjectDeleteTemplate, m_opts);
+			Dialogs.showModalDialogUsingTemplate(renderedTemplate).done(eve.f("pgb.alert.delete"));
 		});
 		eve.on("pgb.error.rebuild", function (error) {
 			console.log("pgb.error.rebuild", error);
