@@ -34,25 +34,25 @@
 	display: inline-block;
 }
 #pgb-btn.normal {
-	background-image: url("icon.svg");
+	background-image: url("../svg/icon.svg");
 	background-position: 0 0;
 }
 #pgb-btn.disabled {
-	background-image: url("icon.svg");
+	background-image: url("../svg/icon.svg");
 	background-position: 0 -40px;
 }
 #pgb-btn.error {
-	background-image: url("icon.svg");
+	background-image: url("../svg/icon.svg");
 	background-position: 0 -20px;
 }
 #pgb-btn.progress {
-	background-image: url("icon-progress.svg");
+	background-image: url("../svg/icon-progress.svg");
 	background-position: 0 0;
 }
 #pgb-panel span.icon {
 	padding: 4px 0 0 20px;
 	margin: 0 2px;
-	background-image: url("icon.svg");
+	background-image: url("../svg/icon.svg");
 }
 #pgb-panel span.icon.ios-complete {
 	background-position: -20px 0;
@@ -135,7 +135,7 @@
 }
 
 #pgb-anim {
-	background: rgba(0, 0, 0, .75) url("anim.svg") no-repeat 50% 50%;
+	background: rgba(0, 0, 0, .75) url("../svg/anim.svg") no-repeat 50% 50%;
 	display: none;
 	width: 100%;
 	height: 100%;
@@ -187,3 +187,25 @@
 	font-size: 10px;
 	padding: 3px 5px;
 }
+
+#pgb-btn-holder {
+    text-align:center;
+    padding-top: 2px;
+    padding-left: 5px;
+}
+
+#pgb-btn-holder + .popover{
+    width: 900px;
+    background-color: #FFF6E0;
+}
+
+#pgb-btn-holder + .popover .arrow{
+    margin-top: -30px;
+    background-color: #FFF6E0;
+    
+}
+
+#pgb-panel-project-list-table img{
+    height: 20px;  
+    width: 20px;  
+}    

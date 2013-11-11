@@ -1,0 +1,14 @@
+<div class="{{dlgClass}} template modal">
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h1 class="dialog-title">{{Strings.NEW_DIALOG_TITLE}}</h1>
+    </div>
+    <div class="modal-body">
+        <p>{{Strings.NEW_DIALOG_MESSAGE}}</p>
+        <input placeholder="{{Strings.NEW_DIALOG_APP_NAME}}" onblur="brackets_phonegap_new_project = this.value" id="pgb-new-app-name" type="text">
+    </div>
+    <div class="modal-footer">
+        <button class="dialog-button btn primary" data-button-id="ok">{{Dialogs.DIALOG_BTN_OK}}</button>
+        <button class="dialog-button btn" data-button-id="cancel">{{Dialogs.DIALOG_BTN_CANCEL}}</button>
+    </div>
+</div>

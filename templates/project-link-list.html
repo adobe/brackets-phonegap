@@ -1,0 +1,36 @@
+<div class="{{dlgClass}} template modal">
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h1 class="dialog-title">{{{Strings.LINK_DIALOG_TITLE}}}</h1>
+    </div>
+    <div class="modal-body">
+        <p id="pgb-link-dialog-instructions">{{{Strings.LINK_DIALOG_INSTRUCTIONS}}}</p>
+        <table class="condensed-table">
+            <tr>
+                <td>
+                    <input class="pgb-project-radio" type="radio" name="pgb-projects" value="-1" id="pgb-unlink-radio" checked="">
+                </td>
+                <td>
+                    <label for="pgb-unlink-radio" class="pgb-project-label">{{Strings.UNLINK_OPTION}}</label>
+                </td>
+            </tr>
+            {{#projects}}
+            <tr>
+                <td>
+                    <input class="pgb-project-radio" type="radio" name="pgb-projects" id="input-{{id}}" value="{{id}}" onclick="brackets_phonegap_linked_project_Id =  {{id}}">
+                </td>
+                <td>
+                    <label for="input-{{id}}" class="pgb-project-label">
+                        <span class="project-title" for="cb-{{id}}">{{title}}</span>
+                        <p>{{description}}</p>
+                    </label>
+                </td>
+            </tr>
+            {{/projects}}
+        </table>    
+    </div>
+    <div class="modal-footer">
+        <button class="dialog-button btn primary" data-button-id="ok">{{Dialogs.DIALOG_BTN_OK}}</button>
+        <button class="dialog-button btn" data-button-id="cancel">{{Dialogs.DIALOG_BTN_CANCEL}}</button>
+    </div>
+</div>

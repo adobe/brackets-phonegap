@@ -52,5 +52,6 @@ define({
 	"NEW_DIALOG_APP_NAME": "Nom de l’application",
 	"NEW_ALERT_MESSAGE": "Nouveau projet PhoneGap Build créé sous le nom",
 	"DELETE_LINK": "Supprimer",
+    "DELETE_CONFIRMATION_TITLE"     : "Supprimer PhoneGap Build Project",
 	"DELETE_CONFIRMATION_MESSAGE": "Voulez-vous vraiment supprimer ce projet ?"
 });

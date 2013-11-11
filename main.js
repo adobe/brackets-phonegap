@@ -32,11 +32,22 @@ require.config({
     locale: navigator.language
 });
 
+var brackets_phonegap_linked_project_Id = 0;
+var brackets_phonegap_new_project = "";
+
 define(function (require, exports, module) {
     "use strict";
 
-	var Strings = require("strings");
-
+	var Strings = require("js/strings");
+    var ProjectListLinkTemplate = require("text!templates/project-link-list.html"),
+        PanelTemplate = require("text!templates/panel.html"),
+        ProjectListPanelTemplate = require("text!templates/project-panel-list.html"),
+        ProjectNewTemplate = require("text!templates/new-project.html"),
+        ProjectDeleteTemplate = require("text!templates/delete-project.html"),
+        LoginTemplate       = require("text!templates/login.html");
+    
+        //LoginTemplate       = require("text!templates/hardcodedlogin.html")
+        
     var CommandManager = brackets.getModule("command/CommandManager"),
 		ProjectManager = brackets.getModule("project/ProjectManager"),
 		EditorManager  = brackets.getModule("editor/EditorManager"),
@@ -44,6 +55,7 @@ define(function (require, exports, module) {
         Dialogs		   = brackets.getModule("widgets/Dialogs"),
         FileUtils      = brackets.getModule("file/FileUtils"),
         ExtensionUtils = brackets.getModule("utils/ExtensionUtils"),
+        PanelManager   = brackets.getModule("view/PanelManager"),
 		eve,
 		format         = (function () {
 		    var tokenRegex = /\{([^\}]+)\}/g,
@@ -70,10 +82,11 @@ define(function (require, exports, module) {
 		})();
 
 	require("widgets/bootstrap-alerts.js");
-	require("qrcode");
-	require("jszip");
-	require(["eve", "base64"], function (eve, base64) {
-				
+	require("js/qrcode");
+	require("js/jszip");
+    require("widgets/bootstrap-tooltip.js");
+    require("widgets/bootstrap-popover.js");
+	require(["eve", "js/base64"], function (eve, base64) {
 		eve.f = function (event) {
 			var attrs = [].slice.call(arguments, 1);
 			return function () {
@@ -160,7 +173,7 @@ define(function (require, exports, module) {
 		}
 
 		function updateApp(id) {
-			if (!id) id = linkedProjectId;
+			if (!id) id = brackets_phonegap_linked_project_Id;
 			$("#pgb-progress-" + id).val(0).css("visibility", "visible");
 			zipProject(id);
 		}
@@ -221,27 +234,26 @@ define(function (require, exports, module) {
 	    	}	
 		}
 		
-		ExtensionUtils.loadStyleSheet(module, "pgb.css");
+		ExtensionUtils.loadStyleSheet(module, "css/pgb.css");
 		
+        var pgbhost = $('<div id="pgb-btn-holder"></div>');
+        
 		button.attr({
 			title: Strings.COMMAND_NAME,
 			id: "pgb-btn",
 			href: "#",
 			"class": "disabled"
 		}).click(eve.f("pgb.button.click"));
-		button.insertAfter("#toolbar-go-live");
-	
-		var $panel = $('<div id="pgb-panel" class="bottom-panel">\
-			    <div class="toolbar simple-toolbar-layout">\
-			        <div class="title">' + Strings.COMMAND_NAME + '</div>\
-			        <div class="title" id="search-result-summary"></div>\
-			        <a href="#" class="close">&times;</a>\
-			    </div>\
-			    <div class="table-container"></div>\
-				<div id="pgb-anim">&nbsp;</div>\
-			</div>'),
-			anim = $("#pgb-anim", $panel);
-		$panel.insertBefore("#status-bar");
+        
+        pgbhost.insertAfter("#toolbar-go-live");
+        pgbhost.html(button);
+        
+        
+        var m_opts_panel = {Strings: Strings};
+        var html_panel = Mustache.render(PanelTemplate, m_opts_panel);
+        var $panel = PanelManager.createBottomPanel("brackets-phonegap", $(html_panel));
+
+        var anim = $("#pgb-anim", $panel);
 		$(".close", $panel).click(eve.f("pgb.panel.close"));
 
 		var $tableContainer = $(".table-container", $panel),
@@ -251,11 +263,13 @@ define(function (require, exports, module) {
 			token,
 			linkedProjectId,
 			pendingDelete,
+            projects,
 			platforms = ["ios", "android", "winphone", "blackberry", "webos", "symbian"];
 
 		function ajax(url, name, type, username, password, showProgress) {
 			if (showProgress) eve("pgb.status.progress");
 			var fullUrl = "https://build.phonegap.com/" + url + (token ? "?auth_token=" + token : "");
+            console.log("full Url called:", fullUrl, "type:", type, "name:", name);
 			$.ajax({
 	            url: fullUrl,
 	            type: type || "get",
@@ -278,21 +292,24 @@ define(function (require, exports, module) {
 		 * @autoClose   Whether or not to automatically close this alert in 5 seconds.
 		 */
 		function showAlert(message, showButtons, name, autoClose) {
-			$(".alert-message").alert("close"); // In case one is already open.
-			var $alert = $("<div>").css({display:"none",position:"absolute",top:0,left:$("#sidebar").css("width"),right:0,"z-index":$("#main-toolbar").css("z-index")+1}).addClass("alert-message pgb fade in").append( $("<button>").attr({"class":"close", "type":"button", "data-dismiss":"alert"}).html("&times;") );
-			$alert.append($("<p>").html(message));
-			if (showButtons) {
-				$alert.append($("<a>").addClass("btn pgb").html("OK").click(function(e) {$(".alert-message").alert("close");eve("pgb.alert." + name + ".ok")}));
-				$alert.append( $("<a>").addClass("btn danger pgb").html("Cancel").click(function(e) {$(".alert-message").alert("close");eve("pgb.alert." + name + ".cancel")}));				
-			} else { // Make it closable by clicking anywhere.
-				$alert.click(function(e) {$(".alert-message").alert("close")});
-			}
-			if (autoClose) {
-				setTimeout(function() { $(".alert-message").alert("close"); }, 5000);
-			}
-			$("#main-toolbar").after($alert);
-			$(".alert-message").alert();
-			$alert.fadeIn("fast");
+                
+            var options = {
+                    animation : true, 
+                    html : true, 
+                    placement : "left",
+                    trigger : "click",
+                    content : message
+                };
+                
+                $("#pgb-btn-holder").popover(options);
+                $("#pgb-btn-holder").popover("show");
+                $("#pgb-btn-holder + .popover").css("top", "20px");
+                $("#pgb-btn-holder + .popover .arrow").css("top", "40%");
+                var doIt = function() {
+                    $("#pgb-btn-holder").popover("destroy");
+                }
+                setTimeout(doIt, 5000);
+            
 		}
 
 		function toggleRebuildLabels(id) {
@@ -323,12 +340,13 @@ define(function (require, exports, module) {
 		});
 		
 		eve.on("pgb.before.login", function () {
-			var $form = $('<form action="#" style="text-align: center">\
-				<input type="email" id="pgb-username" name="username" placeholder="' + Strings.USERNAME_PLACEHOLDER + '"><br><br>\
-				<input type="password" name="password" id="pgb-password" placeholder="' + Strings.PASSWORD_PLACEHOLDER + '"><br><br>\
-				<input type="submit" class="btn primary" value=" ' + Strings.LOGIN_BUTTON_LABEL + ' ">\
-			</form>');
-			$tableContainer.empty().append($form);
+            
+            var m_opts = {Strings: Strings};
+            var renderedTemplate = Mustache.render(LoginTemplate, m_opts);
+            
+            
+			$(".pgb-table-container").append(renderedTemplate);
+            var $form = $("#pgb-login-form");
 			var inputs = $("input", $form);
 			$form.on("submit", function (e) {
 				e.preventDefault();
@@ -383,56 +401,45 @@ define(function (require, exports, module) {
 		});
 		eve.on("pgb.success.list", function (json) {
 			json.apps.sort(function (a,b) {if (a.title < b.title) return -1; if (a.title > b.title) return 1; return 0; });
-			var html = '<table class="condensed-table">';
-			for (var i = 0; i < json.apps.length; i++) {
-				var row = "",
-					app = json.apps[i],
-					projectIcon = "";
+            projects = json.apps;
+            var projectsMassaged = [];
+            
+            
+            for (var i = 0; i < projects.length; i++) {
+                var app = projects[i];
+                var appMassaged = {};
 
-				if (app.icon.filename !== null) {
-					projectIcon = '<img src="https://build.phonegap.com{icon.link}" height="20" alt="icon" style="margin: -5px">';
-				} else {
-					projectIcon = '<span class="icon" style="margin-left: -5px"></span>';
-				}
-
-				row += '<tr><td>' + projectIcon + '</td><td><a href="#" data-url="https://build.phonegap.com/apps/{id}" class="project-link">{title}</a></td><td>';
-				platforms.forEach(function(val, index) {
-					row += '<span data-download="{download.'+val+'}" id="pgb-app-'+val+'-{id}" class="icon '+val+'-{status.'+val+'}"></span>';
-				});
-				row += '</td><td><progress valie="0" max="100" class="pgb-upload-progress" id="pgb-progress-{id}"></td>';
-				row += '<td class="pgb-desc" style="width:75px;"><a href="#" class="pgb-rebuild btn btn-mini primary" data-id="{id}" id="rebuild-link-{id}">' + Strings.REBUILD_LINK + '</a><span style="display:none" id="rebuilding-text-{id}">' + Strings.REBUILDING_MESSAGE + '</span></td>';
-				row += '<td class="pgb-desc" style="width:75px;"><a href="#" class="pgb-delete btn btn-mini danger" data-id="{id}" id="delete-link-{id}">' + Strings.DELETE_LINK + '</a></td></tr>';
-				html += format(row, app);
-			}
-			html += "</table>";
-			$tableContainer.html(html);
-			$tableContainer.click(eve.f("pgb.click"));
+                if (app.icon.filename === null) {
+                    appMassaged.iconlink = require.toUrl('./svg/icon-pg.svg');
+                } else {
+                    appMassaged.iconlink = "https://build.phonegap.com" + app.icon.link;
+                }
+                appMassaged.id = app.id;
+                appMassaged.title = app.title;
+                appMassaged.platforms = [];
+                
+                platforms.forEach(function(val, index) {
+                    var platform = {};
+                    platform.os = val;
+                    platform.download = app.download[val];
+                    if (app.status[val] === null) {
+                        platform.status = "error";
+                    } else {
+                        platform.status = app.status[val];
+                    }    
+                    appMassaged.platforms.push(platform);
+			     });
+                projectsMassaged.push(appMassaged);
+                
+            }
+            var m_opts_project_list = {Strings:Strings, projects: projectsMassaged};
+            var html_project_list = Mustache.render(ProjectListPanelTemplate, m_opts_project_list);
+            $(".pgb-table-container").html(html_project_list);
+            $(".pgb-table-container").click(eve.f("pgb.click"));
+            
             $(".project-link").click(function (e) {
                 eve("pgb.url.open", null, $(e.target).attr("data-url"));
             });
-
-            var $linkDialogInstructions = $("<p>").attr("id", "pgb-link-dialog-instructions").append(Strings.LINK_DIALOG_INSTRUCTIONS);
-			var linkHtml = '<table class="condensed-table">';
-			linkHtml += '<tr><td><input class="pgb-project-radio" type="radio" name="pgb-projects" value="-1" id="pgb-unlink-radio" checked/></td><td><label for="pgb-unlink-radio" class="pgb-project-label">' + Strings.UNLINK_OPTION + '</label></td></tr>';
-			for (var i = 0; i < json.apps.length; i++) {
-				var app = json.apps[i];
-				linkHtml += format('<tr><td><input class="pgb-project-radio" type="radio" name="pgb-projects" id="input-{id}" value="{id}"/></td>\
-									<td><label for="input-{id}" class="pgb-project-label"><span class="project-title" for="cb-{id}">{title}</span><p>{description}</p></label></td></tr>\n', app);
-			}
-			linkHtml += "</table></div>";
-			linkHtml = linkHtml.replace(/<p>null<\/p>/g, "<p></p>");
-			$projectContainer.empty();
-			$projectContainer.append($linkDialogInstructions);
-			$projectContainer.append(linkHtml);
-
-
-			var newItemHTML = "<p>" + Strings.NEW_DIALOG_MESSAGE	 + "</p>";
-			newItemHTML += '<input placeholder="' + Strings.NEW_DIALOG_APP_NAME + '" id="pgb-new-app-name" type="text">';
-
-			$newContainer.empty();
-			$newContainer.append(newItemHTML);
-
-
 		});
 		eve.on("pgb.click", function (e) {
 			console.log("pgb.click");
@@ -483,20 +490,21 @@ define(function (require, exports, module) {
 			console.warn(2, json);
 		});
 		eve.on("pgb.rebuild", function (id) {
+            console.log("Rebuild Called", "api/v1/apps/" + id, "rebuild");
 			toggleRebuildLabels(id);
 			ajax("api/v1/apps/" + id, "rebuild", "put", null, null, false);
 		});
 		eve.on("pgb.delete", function (id) {
 			pendingDelete = id;
-			showAlert(Strings.DELETE_CONFIRMATION_MESSAGE, true, "delete", false);
-
-
-
+            var m_opts = {Strings: Strings, projects:projects, Dialogs: Dialogs};
+            var renderedTemplate = Mustache.render(ProjectDeleteTemplate, m_opts);
+			Dialogs.showModalDialogUsingTemplate(renderedTemplate).done(eve.f("pgb.alert.delete"));
 		});
 		eve.on("pgb.error.rebuild", function (error) {
 			console.log("pgb.error.rebuild", error);
 		});
 		eve.on("pgb.success.rebuild", function (json) {
+            console.log("pgb.success.rebuild", json);
 			eve("pgb.success.status", null, json);
 			showAlert(Strings.REBUILDING_SUCCESS_MESSAGE, false, null, true);
 		});
@@ -507,26 +515,25 @@ define(function (require, exports, module) {
             brackets.app.openURLInDefaultBrowser(function (err) {}, url);
         });
         eve.on("pgb.link", function() {
-			Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.LINK_DIALOG_TITLE, $projectContainer).done(eve.f("pgb.close.link"));
+            var m_opts = {Strings: Strings, projects:projects, Dialogs: Dialogs};
+            var renderedTemplate = Mustache.render(ProjectListLinkTemplate, m_opts);
+			Dialogs.showModalDialogUsingTemplate(renderedTemplate).done(eve.f("pgb.close.link"));
         });
         eve.on("pgb.new", function() {
-			Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.NEW_DIALOG_TITLE, $newContainer).done(eve.f("pgb.close.new"));
+            var m_opts_new_project = {Strings:Strings, Dialogs: Dialogs};
+            var html_new_project = Mustache.render(ProjectNewTemplate, m_opts_new_project);
+			Dialogs.showModalDialogUsingTemplate(html_new_project).done(eve.f("pgb.close.new"));
         });
         eve.on("pgb.close.link", function(action) {
-        	var val = $("input[name=pgb-projects]:checked", $projectContainer).val();
-        	if (action === Dialogs.DIALOG_BTN_CANCEL) {
-        		// NO-OP. Probably don't have to do anything.
-        	}
-			else if (val == -1) { // Unlinking
-				linkedProjectId = null;
-			} else if (action === Dialogs.DIALOG_BTN_OK) {
-				// RCS - force this to be cast as a number so we don't upload a new project after linking our code (fix for #30)
-				linkedProjectId = Number(val);
-				showAlert(Strings.LINK_SUCCESSFUL_MESSAGE + Strings.SEND_FILES_MENU_ENTRY + ".", false, null, false);
+            console.log(brackets_phonegap_linked_project_Id);
+        	if (action === Dialogs.DIALOG_BTN_OK) {
+                showAlert(Strings.LINK_SUCCESSFUL_MESSAGE + Strings.SEND_FILES_MENU_ENTRY + ".", false, null, false);
 			}
         });
          eve.on("pgb.close.new", function(action) {
-        	var val = $("#pgb-new-app-name", $newContainer).val();
+            console.log(brackets_phonegap_new_project, action);
+             
+        	var val = brackets_phonegap_new_project;
         	if (action === Dialogs.DIALOG_BTN_CANCEL) {
         		// NO-OP. Probably don't have to do anything.
         	}
@@ -536,23 +543,30 @@ define(function (require, exports, module) {
 			}
         });
         eve.on("pgb.update.confirm", function() {
-        	if (!linkedProjectId) {
+        	if (!brackets_phonegap_linked_project_Id) {
         		showAlert(Strings.PROJECT_NOT_LINKED_MESSAGE + Strings.LINK_PROJECT_MENU_ITEM, false, null, false);
         		return;
         	}
-        	showAlert(Strings.UPLOAD_CONFIRMATION_MESSAGE, true, "bundle", false);
+            var title = Strings.SEND_FILES_MENU_ENTRY;
+            var message = Strings.UPLOAD_CONFIRMATION_MESSAGE;
+            Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, title, message).done(eve.f("pgb.alert.bundle"));
         });
-        eve.on("pgb.alert.bundle.ok", function() {
-        	updateApp();
+        eve.on("pgb.alert.bundle", function(action) {
+            if (action === Dialogs.DIALOG_BTN_CANCEL) {
+        		// NO-OP. Probably don't have to do anything.
+        	}
+			else if (action === Dialogs.DIALOG_BTN_OK) {
+				updateApp();
+			}
         });
-        eve.on("pgb.alert.bundle.cancel", function() {
-        	// NO-OP
-        });
-         eve.on("pgb.alert.delete.ok", function(id) {
-        	deleteApp(id);
-        });
-        eve.on("pgb.alert.delete.cancel", function() {
-        	// NO-OP
+        eve.on("pgb.alert.delete", function(action) {
+            if (action === Dialogs.DIALOG_BTN_CANCEL) {
+        		// NO-OP. Probably don't have to do anything.
+        	}
+			else if (action === Dialogs.DIALOG_BTN_OK) {
+				deleteApp(pendingDelete);
+			}
+        	
         });
         eve.on("pgb.success.status", function(json) {
         	var finished = true,
@@ -560,7 +574,7 @@ define(function (require, exports, module) {
 
         	// Assoicate new projects with this folder
         	if (json.build_count == null){
-        		linkedProjectId = json.id;
+        		brackets_phonegap_linked_project_Id = json.id;
         	}
 
         	for (var os in json.status) {
