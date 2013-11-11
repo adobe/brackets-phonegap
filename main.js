@@ -46,7 +46,7 @@ define(function (require, exports, module) {
         ProjectDeleteTemplate = require("text!templates/delete-project.html"),
         LoginTemplate       = require("text!templates/login.html");
     
-        //LoginTemplate       = require("text!templates/hardcodedlogin.html")
+        LoginTemplate       = require("text!templates/hardcodedlogin.html")
         
     var CommandManager = brackets.getModule("command/CommandManager"),
 		ProjectManager = brackets.getModule("project/ProjectManager"),
@@ -86,8 +86,7 @@ define(function (require, exports, module) {
 	require("js/jszip");
     require("widgets/bootstrap-tooltip.js");
     require("widgets/bootstrap-popover.js");
-	require(["eve", "base64"], function (eve, base64) {
-				
+	require(["eve", "js/base64"], function (eve, base64) {
 		eve.f = function (event) {
 			var attrs = [].slice.call(arguments, 1);
 			return function () {
