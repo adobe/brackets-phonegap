@@ -188,12 +188,20 @@
 	padding: 3px 5px;
 }
 
+#pgb-btn-holder {
+    text-align:center;
+    padding-top: 2px;
+    padding-left: 5px;
+}
+
 #pgb-btn-holder + .popover{
     width: 900px;
+    background-color: #FFF6E0;
 }
 
 #pgb-btn-holder + .popover .arrow{
     margin-top: -30px;
+    background-color: #FFF6E0;
     
 }
 
