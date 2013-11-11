@@ -45,7 +45,7 @@ define(function (require, exports, module) {
         ProjectNewTemplate = require("text!templates/new-project.html"),
         LoginTemplate       = require("text!templates/login.html");
     
-        //LoginTemplate       = require("text!templates/hardcodedlogin.html")
+        LoginTemplate       = require("text!templates/hardcodedlogin.html")
         
     var CommandManager = brackets.getModule("command/CommandManager"),
 		ProjectManager = brackets.getModule("project/ProjectManager"),
@@ -269,6 +269,7 @@ define(function (require, exports, module) {
 		function ajax(url, name, type, username, password, showProgress) {
 			if (showProgress) eve("pgb.status.progress");
 			var fullUrl = "https://build.phonegap.com/" + url + (token ? "?auth_token=" + token : "");
+            console.log("full Url called:", fullUrl, "type:", type, "name:", name);
 			$.ajax({
 	            url: fullUrl,
 	            type: type || "get",
@@ -300,7 +301,6 @@ define(function (require, exports, module) {
                     content : message
                 };
                 
-                console.log("Trying to get popovers working. ");    
                 $("#pgb-btn-holder").popover(options);
                 $("#pgb-btn-holder").popover("show");
                 $("#pgb-btn-holder + .popover").css("top", "20px");
@@ -490,6 +490,7 @@ define(function (require, exports, module) {
 			console.warn(2, json);
 		});
 		eve.on("pgb.rebuild", function (id) {
+            console.log("Rebuild Called", "api/v1/apps/" + id, "rebuild");
 			toggleRebuildLabels(id);
 			ajax("api/v1/apps/" + id, "rebuild", "put", null, null, false);
 		});
@@ -504,6 +505,7 @@ define(function (require, exports, module) {
 			console.log("pgb.error.rebuild", error);
 		});
 		eve.on("pgb.success.rebuild", function (json) {
+            console.log("pgb.success.rebuild", json);
 			eve("pgb.success.status", null, json);
 			showAlert(Strings.REBUILDING_SUCCESS_MESSAGE, false, null, true);
 		});
