@@ -9,4 +9,7 @@
         "type" : "git",
          "url" : "https://github.com/adobe/brackets-phonegap.git"
     }
+    "engines": {
+        "brackets": ">=0.30.0"
+    }
 }
