@@ -81,11 +81,12 @@ define(function (require, exports, module) {
 		    };
 		})();
 
-	require("widgets/bootstrap-alerts.js");
+	require("js/widgets/bootstrap-alert");
 	require("js/qrcode");
 	require("js/jszip");
-    require("widgets/bootstrap-tooltip.js");
-    require("widgets/bootstrap-popover.js");
+    require("js/widgets/bootstrap-tooltip");
+    require("js/widgets/bootstrap-popover");
+ 
 	require(["eve", "js/base64"], function (eve, base64) {
 		eve.f = function (event) {
 			var attrs = [].slice.call(arguments, 1);
