@@ -293,7 +293,6 @@ define(function (require, exports, module) {
 		 * @autoClose   Whether or not to automatically close this alert in 5 seconds.
 		 */
 		function showAlert(message, showButtons, name, autoClose) {
-                
             var options = {
                     animation : true, 
                     html : true, 
@@ -352,6 +351,7 @@ define(function (require, exports, module) {
 			$form.on("submit", function (e) {
 				e.preventDefault();
 				eve("pgb.login", null, inputs[0].value, inputs[1].value);
+				$("#pgb-login-form input[type=submit]").attr("disabled","disabled");
 			});
 		});
 		eve.on("pgb.panel.open", function () {
@@ -365,6 +365,7 @@ define(function (require, exports, module) {
 		eve.on("pgb.error", function (json) {
 			Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.LOGIN_FAILED_DIALOG_TITLE, Strings.LOGIN_FAILED_DIALOG_MESSAGE);
 			eve("pgb.status.error");
+			$("#pgb-login-form input[type=submit]").removeAttr("disabled");
 		});
 		eve.on("pgb.success", function (json) {
 			eve("pgb.status.normal");
