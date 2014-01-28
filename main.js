@@ -44,7 +44,9 @@ define(function (require, exports, module) {
         ProjectListPanelTemplate = require("text!templates/project-panel-list.html"),
         ProjectNewTemplate = require("text!templates/new-project.html"),
         ProjectDeleteTemplate = require("text!templates/delete-project.html"),
-        LoginTemplate       = require("text!templates/login.html");
+        LoginTemplate       = require("text!templates/login.html"),
+        NativeApp               = brackets.getModule("utils/NativeApp");
+
     
         //LoginTemplate       = require("text!templates/hardcodedlogin.html")
         
@@ -514,7 +516,8 @@ define(function (require, exports, module) {
 			console.log("pgb.failure.rebuild");
 		});
         eve.on("pgb.url.open", function(url) {
-            brackets.app.openURLInDefaultBrowser(function (err) {}, url);
+            NativeApp.openURLInDefaultBrowser(url);
+ 
         });
         eve.on("pgb.link", function() {
             var m_opts = {Strings: Strings, projects:projects, Dialogs: Dialogs};
