@@ -34,6 +34,7 @@ require.config({
 
 var brackets_phonegap_linked_project_Id = 0;
 var brackets_phonegap_new_project = "";
+var brackets_imbusy = 0;
 
 define(function (require, exports, module) {
     "use strict";
@@ -180,6 +181,7 @@ define(function (require, exports, module) {
 		}
 
 		function updateApp(id) {
+			brackets_imbusy = 1;
 			if (!id) id = brackets_phonegap_linked_project_Id;
 			$("#pgb-progress-" + id).val(0).css("visibility", "visible");
 			zipProject(id);
@@ -217,6 +219,7 @@ define(function (require, exports, module) {
 			xhr.addEventListener("loadend", function (ev) { // Success or failure
 				$("#pgb-progress-" + id).css("visibility", "hidden");
 				toggleRebuildLabels(id);
+				brackets_imbusy = 0;	
 				eve("pgb.success.status", null, JSON.parse(this.responseText));
 			}, false);
 			xhr.upload.addEventListener("error", function (ev) {
@@ -265,7 +268,7 @@ define(function (require, exports, module) {
 
 		$(".close", $html_panel).click(eve.f("pgb.panel.close"));
 
-        var $panel = PanelManager.createBottomPanel("brackets-phonegap", $html_panel);
+        var $panel = PanelManager.createBottomPanel("brackets-phonegap", $html_panel, 200);
 
         var anim = $("#pgb-anim", $panel);
 
@@ -282,7 +285,7 @@ define(function (require, exports, module) {
 		function ajax(url, name, type, username, password, showProgress) {
 			if (showProgress) eve("pgb.status.progress");
 			var fullUrl = "https://build.phonegap.com/" + url + (token ? "?auth_token=" + token : "");
-            console.log("full Url called:", fullUrl, "type:", type, "name:", name);
+            //console.log("full Url called:", fullUrl, "type:", type, "name:", name);
 			$.ajax({
 	            url: fullUrl,
 	            type: type || "get",
@@ -554,10 +557,15 @@ define(function (require, exports, module) {
         	}
 			else if (action === Dialogs.DIALOG_BTN_OK) {
 				showAlert(Strings.NEW_ALERT_MESSAGE + " <em>" + val +  "</em>.", false, null, false);
+				console.log("closed call on new, now doing updateApp");
 				updateApp(val);
 			}
         });
         eve.on("pgb.update.confirm", function() {
+        	if(brackets_imbusy) {
+        		showAlert("I'm currently doing a build", false, null, false);
+        		return;
+        	}
         	if (!brackets_phonegap_linked_project_Id) {
         		showAlert(Strings.PROJECT_NOT_LINKED_MESSAGE + Strings.LINK_PROJECT_MENU_ITEM, false, null, false);
         		return;
