@@ -44,8 +44,9 @@ define(function (require, exports, module) {
         ProjectListPanelTemplate = require("text!templates/project-panel-list.html"),
         ProjectNewTemplate = require("text!templates/new-project.html"),
         ProjectDeleteTemplate = require("text!templates/delete-project.html"),
-        LoginTemplate       = require("text!templates/login.html"),
-        NativeApp               = brackets.getModule("utils/NativeApp");
+        LoginTemplate = require("text!templates/login.html"),
+        NativeApp = brackets.getModule("utils/NativeApp"),
+        AppInit = brackets.getModule("utils/AppInit");
 
     
         //LoginTemplate       = require("text!templates/hardcodedlogin.html")
@@ -58,7 +59,7 @@ define(function (require, exports, module) {
         FileUtils      = brackets.getModule("file/FileUtils"),
         ExtensionUtils = brackets.getModule("utils/ExtensionUtils"),
         PanelManager   = brackets.getModule("view/PanelManager"),
-		eve,
+		eve, base64, 
 		format         = (function () {
 		    var tokenRegex = /\{([^\}]+)\}/g,
 		        objNotationRegex = /(?:(?:^|\.)(.+?)(?=\[|\.|$|\()|\[('|")(.+?)\2\])(\(\))?/g, // matches .xxxxx or ["xxxxx"] to run over object properties
@@ -88,8 +89,16 @@ define(function (require, exports, module) {
 	require("js/jszip");
     require("js/widgets/bootstrap-tooltip");
     require("js/widgets/bootstrap-popover");
- 
-	require(["eve", "js/base64"], function (eve, base64) {
+
+	//This seems wrong 
+	require(["eve", "js/base64"], function (myeve, mybase64) {
+		eve = myeve;
+		base64 = mybase64;
+
+	});
+
+ 	AppInit.appReady(function() {
+		
 		eve.f = function (event) {
 			var attrs = [].slice.call(arguments, 1);
 			return function () {
@@ -97,11 +106,6 @@ define(function (require, exports, module) {
 			};
 		};
 
-	    var PGB_COMMAND_ID = "phonegap.build";   // package-style naming to avoid collisions
-	    CommandManager.register(Strings.COMMAND_NAME, PGB_COMMAND_ID, eve.f("pgb.button.click"));
-	
-		var button = $("<a>");
-		
 		function zipProject(id) {
 			var rootPath = ProjectManager.getProjectRoot().fullPath,
 				files = [],
@@ -237,6 +241,10 @@ define(function (require, exports, module) {
 	    	}	
 		}
 		
+	    var PGB_COMMAND_ID = "phonegap.build";   // package-style naming to avoid collisions
+	    CommandManager.register(Strings.COMMAND_NAME, PGB_COMMAND_ID, eve.f("pgb.button.click"));
+	
+		var button = $("<a>");		
 		ExtensionUtils.loadStyleSheet(module, "css/pgb.css");
 		
         var pgbhost = $('<div id="pgb-btn-holder"></div>');
@@ -253,11 +261,13 @@ define(function (require, exports, module) {
         
         
         var m_opts_panel = {Strings: Strings};
-        var html_panel = Mustache.render(PanelTemplate, m_opts_panel);
-        var $panel = PanelManager.createBottomPanel("brackets-phonegap", $(html_panel));
+        var $html_panel = $(Mustache.render(PanelTemplate, m_opts_panel));
+
+		$(".close", $html_panel).click(eve.f("pgb.panel.close"));
+
+        var $panel = PanelManager.createBottomPanel("brackets-phonegap", $html_panel);
 
         var anim = $("#pgb-anim", $panel);
-		$(".close", $panel).click(eve.f("pgb.panel.close"));
 
 		var $tableContainer = $(".table-container", $panel),
 			$projectContainer = $("<div>").attr("id", "pgb-link-container"),
