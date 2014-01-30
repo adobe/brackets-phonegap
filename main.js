@@ -34,6 +34,7 @@ require.config({
 
 var brackets_phonegap_linked_project_Id = 0;
 var brackets_phonegap_new_project = "";
+var brackets_imbusy = 0;
 
 define(function (require, exports, module) {
     "use strict";
@@ -44,7 +45,10 @@ define(function (require, exports, module) {
         ProjectListPanelTemplate = require("text!templates/project-panel-list.html"),
         ProjectNewTemplate = require("text!templates/new-project.html"),
         ProjectDeleteTemplate = require("text!templates/delete-project.html"),
-        LoginTemplate       = require("text!templates/login.html");
+        LoginTemplate = require("text!templates/login.html"),
+        NativeApp = brackets.getModule("utils/NativeApp"),
+        AppInit = brackets.getModule("utils/AppInit");
+
     
         //LoginTemplate       = require("text!templates/hardcodedlogin.html")
         
@@ -56,7 +60,7 @@ define(function (require, exports, module) {
         FileUtils      = brackets.getModule("file/FileUtils"),
         ExtensionUtils = brackets.getModule("utils/ExtensionUtils"),
         PanelManager   = brackets.getModule("view/PanelManager"),
-		eve,
+		eve, base64, 
 		format         = (function () {
 		    var tokenRegex = /\{([^\}]+)\}/g,
 		        objNotationRegex = /(?:(?:^|\.)(.+?)(?=\[|\.|$|\()|\[('|")(.+?)\2\])(\(\))?/g, // matches .xxxxx or ["xxxxx"] to run over object properties
@@ -81,12 +85,21 @@ define(function (require, exports, module) {
 		    };
 		})();
 
-	require("widgets/bootstrap-alerts.js");
+	require("js/widgets/bootstrap-alert");
 	require("js/qrcode");
 	require("js/jszip");
-    require("widgets/bootstrap-tooltip.js");
-    require("widgets/bootstrap-popover.js");
-	require(["eve", "js/base64"], function (eve, base64) {
+    require("js/widgets/bootstrap-tooltip");
+    require("js/widgets/bootstrap-popover");
+
+	//This seems wrong 
+	require(["eve", "js/base64"], function (myeve, mybase64) {
+		eve = myeve;
+		base64 = mybase64;
+
+	});
+
+ 	AppInit.appReady(function() {
+		
 		eve.f = function (event) {
 			var attrs = [].slice.call(arguments, 1);
 			return function () {
@@ -94,11 +107,6 @@ define(function (require, exports, module) {
 			};
 		};
 
-	    var PGB_COMMAND_ID = "phonegap.build";   // package-style naming to avoid collisions
-	    CommandManager.register(Strings.COMMAND_NAME, PGB_COMMAND_ID, eve.f("pgb.button.click"));
-	
-		var button = $("<a>");
-		
 		function zipProject(id) {
 			var rootPath = ProjectManager.getProjectRoot().fullPath,
 				files = [],
@@ -173,6 +181,7 @@ define(function (require, exports, module) {
 		}
 
 		function updateApp(id) {
+			brackets_imbusy = 1;
 			if (!id) id = brackets_phonegap_linked_project_Id;
 			$("#pgb-progress-" + id).val(0).css("visibility", "visible");
 			zipProject(id);
@@ -210,6 +219,7 @@ define(function (require, exports, module) {
 			xhr.addEventListener("loadend", function (ev) { // Success or failure
 				$("#pgb-progress-" + id).css("visibility", "hidden");
 				toggleRebuildLabels(id);
+				brackets_imbusy = 0;	
 				eve("pgb.success.status", null, JSON.parse(this.responseText));
 			}, false);
 			xhr.upload.addEventListener("error", function (ev) {
@@ -234,6 +244,10 @@ define(function (require, exports, module) {
 	    	}	
 		}
 		
+	    var PGB_COMMAND_ID = "phonegap.build";   // package-style naming to avoid collisions
+	    CommandManager.register(Strings.COMMAND_NAME, PGB_COMMAND_ID, eve.f("pgb.button.click"));
+	
+		var button = $("<a>");		
 		ExtensionUtils.loadStyleSheet(module, "css/pgb.css");
 		
         var pgbhost = $('<div id="pgb-btn-holder"></div>');
@@ -250,11 +264,13 @@ define(function (require, exports, module) {
         
         
         var m_opts_panel = {Strings: Strings};
-        var html_panel = Mustache.render(PanelTemplate, m_opts_panel);
-        var $panel = PanelManager.createBottomPanel("brackets-phonegap", $(html_panel));
+        var $html_panel = $(Mustache.render(PanelTemplate, m_opts_panel));
+
+		$(".close", $html_panel).click(eve.f("pgb.panel.close"));
+
+        var $panel = PanelManager.createBottomPanel("brackets-phonegap", $html_panel, 200);
 
         var anim = $("#pgb-anim", $panel);
-		$(".close", $panel).click(eve.f("pgb.panel.close"));
 
 		var $tableContainer = $(".table-container", $panel),
 			$projectContainer = $("<div>").attr("id", "pgb-link-container"),
@@ -269,7 +285,7 @@ define(function (require, exports, module) {
 		function ajax(url, name, type, username, password, showProgress) {
 			if (showProgress) eve("pgb.status.progress");
 			var fullUrl = "https://build.phonegap.com/" + url + (token ? "?auth_token=" + token : "");
-            console.log("full Url called:", fullUrl, "type:", type, "name:", name);
+            //console.log("full Url called:", fullUrl, "type:", type, "name:", name);
 			$.ajax({
 	            url: fullUrl,
 	            type: type || "get",
@@ -292,7 +308,6 @@ define(function (require, exports, module) {
 		 * @autoClose   Whether or not to automatically close this alert in 5 seconds.
 		 */
 		function showAlert(message, showButtons, name, autoClose) {
-                
             var options = {
                     animation : true, 
                     html : true, 
@@ -351,6 +366,7 @@ define(function (require, exports, module) {
 			$form.on("submit", function (e) {
 				e.preventDefault();
 				eve("pgb.login", null, inputs[0].value, inputs[1].value);
+				$("#pgb-login-form input[type=submit]").attr("disabled","disabled");
 			});
 		});
 		eve.on("pgb.panel.open", function () {
@@ -364,6 +380,7 @@ define(function (require, exports, module) {
 		eve.on("pgb.error", function (json) {
 			Dialogs.showModalDialog(Dialogs.DIALOG_ID_ERROR, Strings.LOGIN_FAILED_DIALOG_TITLE, Strings.LOGIN_FAILED_DIALOG_MESSAGE);
 			eve("pgb.status.error");
+			$("#pgb-login-form input[type=submit]").removeAttr("disabled");
 		});
 		eve.on("pgb.success", function (json) {
 			eve("pgb.status.normal");
@@ -512,7 +529,8 @@ define(function (require, exports, module) {
 			console.log("pgb.failure.rebuild");
 		});
         eve.on("pgb.url.open", function(url) {
-            brackets.app.openURLInDefaultBrowser(function (err) {}, url);
+            NativeApp.openURLInDefaultBrowser(url);
+ 
         });
         eve.on("pgb.link", function() {
             var m_opts = {Strings: Strings, projects:projects, Dialogs: Dialogs};
@@ -539,10 +557,15 @@ define(function (require, exports, module) {
         	}
 			else if (action === Dialogs.DIALOG_BTN_OK) {
 				showAlert(Strings.NEW_ALERT_MESSAGE + " <em>" + val +  "</em>.", false, null, false);
+				console.log("closed call on new, now doing updateApp");
 				updateApp(val);
 			}
         });
         eve.on("pgb.update.confirm", function() {
+        	if(brackets_imbusy) {
+        		showAlert("I'm currently doing a build", false, null, false);
+        		return;
+        	}
         	if (!brackets_phonegap_linked_project_Id) {
         		showAlert(Strings.PROJECT_NOT_LINKED_MESSAGE + Strings.LINK_PROJECT_MENU_ITEM, false, null, false);
         		return;
