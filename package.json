@@ -1,7 +1,7 @@
 {
     "name": "brackets-phonegap",
     "description": "PhoneGap extension for Brackets.",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "keywords": [".html", ".css", ".js"],
     "homepage": "https://github.com/adobe/brackets-phonegap/",
     "bugs": "https://github.com/adobe/brackets-phonegap/issues",
